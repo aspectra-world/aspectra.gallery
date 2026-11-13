@@ -1,0 +1,38 @@
+/* aspectra.gallery: the aspectra brand kit's ground, text and accent over Facet.
+   Loaded right after facet.css and before the theme sheet, so an accent set in
+   gallery.cfg or album.cfg still wins. Dark values from the kit
+   (aspectra-design.css), light ones stay Facet's. */
+@font-face{ font-family:'Manrope'; src:url('/static/fonts/Manrope-400.woff2') format('woff2'); font-weight:400; font-style:normal; font-display:swap }
+@font-face{ font-family:'Manrope'; src:url('/static/fonts/Manrope-500.woff2') format('woff2'); font-weight:500; font-style:normal; font-display:swap }
+@font-face{ font-family:'Manrope'; src:url('/static/fonts/Manrope-600.woff2') format('woff2'); font-weight:600 700; font-style:normal; font-display:swap }
+
+:root{
+  --sans: 'Manrope', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+
+  /* the calm night of aspectra.world */
+  --bg-deep:   light-dark(#ececf1, #06080c);
+  --bg:        light-dark(#f4f4f7, #080b10);
+  --bg-2:      light-dark(#ececf1, #0a0d13);
+  --bg-frame:  light-dark(#ececf1, #0c0f16);
+  --surface:   light-dark(#fafafc, #10141c);
+  --card:      light-dark(#ffffff, #121722);
+  --surface-2: light-dark(#f4f4f7, #19202c);
+  --surface-3: light-dark(#e9e9ef, #222a38);
+  --stroke-1:  light-dark(#c4c4cf, #3c4555);
+  --stroke-2:  light-dark(#dcdce5, #222936);
+  --stroke-3:  light-dark(#e9e9ef, #1a202b);
+  --text:      light-dark(#121216, #e7e9ef);
+  --text-dim:  light-dark(#5b5b66, #9aa3b2);
+  --text-ghost:light-dark(#73737f, #8b93a3);
+  --title-a:   light-dark(#121216, #f4f6fa);
+  --title-b:   light-dark(#4a4a56, #8b93a3);
+  --ink:       light-dark(#121216, #e7e9ef);
+
+  /* Blue Bell */
+  --acc:       light-dark(#2b5f8a, #4e9bd6);
+  --acc-deep:  light-dark(#2b5f8a, #2f6fa3);
+  --acc-fill:  light-dark(#2b5f8a, #2f6fa3);
+  --acc-soft:  light-dark(rgba(43,95,138,.09), rgba(78,155,214,.16));
+  --acc-line:  light-dark(rgba(43,95,138,.36), rgba(78,155,214,.50));
+  --ring:      0 0 0 3px light-dark(rgba(43,95,138,.28), rgba(78,155,214,.42));
+}

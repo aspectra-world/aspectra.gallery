@@ -25,8 +25,14 @@ carries the fork's name.
 - Update check: asks nobody by default (`UPDATE_URL` empty = off); the original asked its
   author's gallery.
 
+- Look of the public gallery: the brand kit's dark ground, text and Blue Bell accent
+  (`static/f/aspectra-tokens.css`, before the theme sheet, so an accent from gallery.cfg or
+  album.cfg still wins), Manrope for text and Space Grotesk for headings and the wordmark
+  (`static/f/aspectra.css`; a site face from gallery.cfg still wins). The backdrop without a
+  wallpaper is the moving starfield of aspectra.world (`static/f/starfield.js`, built from
+  its `starfield.ts`, dark scheme only) instead of Nova; wallpapers per album stay.
+
 ## Planned
 
-- aspectra look: brand-kit colours and fonts, the moving starfield as the default backdrop.
 - A card for aspectra.home (`GET /api/home`, contract 1).
 - In the admin: scan interval and folder watcher, GPS hiding/stripping, image sizes.

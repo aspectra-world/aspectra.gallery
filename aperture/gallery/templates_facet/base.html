@@ -8,13 +8,15 @@
   <link rel="icon" type="{{ brand.favicon_type }}" href="{{ brand.favicon }}">
   <meta name="generator" content="{{ vendor.generator }}">
   <link rel="author" href="/humans.txt">
-  {# Facet first, then the accent the gallery or the album sets (theme
+  {# Facet first, then the aspectra kit's tokens, then the accent the gallery or the album sets (theme
      sheet), then the gallery's own sheet, which derives Facet's accent faces
      from that accent, then the kept building blocks (charts). #}
   <link rel="stylesheet" href="{{ static_url('f/facet.css') }}">
+  <link rel="stylesheet" href="{{ static_url('f/aspectra-tokens.css') }}">
   {% set theme_css = theme_css_url(bg_album | default(none)) %}
   {% if theme_css %}<link rel="stylesheet" href="{{ theme_css }}">{% endif %}
   <link rel="stylesheet" href="{{ static_url('f/gallery.css') }}">
+  <link rel="stylesheet" href="{{ static_url('f/aspectra.css') }}">
   <link rel="stylesheet" href="{{ static_url('f/blocks.css') }}">
   {# gallery.cfg `faces` (the console's Site > Look): Nebula Mono and the
      Nebula icon font in place of the stock set, the same fa-* class names #}
@@ -33,7 +35,7 @@
   <link rel="preload" href="{{ site_face.preload.href }}" as="font" type="{{ site_face.preload.type }}" crossorigin>
   <link rel="stylesheet" href="{{ site_face.css }}">
   {% endif %}
-  <link rel="preload" href="/static/fonts/SpaceGrotesk-400.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/static/fonts/Manrope-400.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="/static/fonts/SpaceGrotesk-600.woff2" as="font" type="font/woff2" crossorigin>
   {% block meta %}
   <meta property="og:site_name" content="{{ brand.title }}">
@@ -49,12 +51,13 @@
 </head>
 <body class="{% block body_class %}{% endblock %}">
   <a class="g-skip" href="#main">{{ t('aria.skip') }}</a>
-  {# The backdrop. With nothing configured it is Facet's Nova, drawn in CSS
-     and tinted by the accent; an album or gallery.cfg wallpaper shows the
-     picture under a veil instead (one <picture>, so only one file loads). #}
+  {# The backdrop. With nothing configured it is the moving starfield of
+     aspectra.world (f/starfield.js, dark scheme only); an album or gallery.cfg
+     wallpaper shows the picture under a veil instead (one <picture>, so only
+     one file loads). #}
   {% set _bga = bg_album | default(none) %}
   {% if wears_nova(_bga) %}
-  <div class="g-bg f-nova f-nova--fixed f-nova--veil" aria-hidden="true"></div>
+  <div class="g-bg g-stars" aria-hidden="true"><canvas class="g-stars__canvas" data-starfield></canvas></div>
   {% else %}
   {% set bg = site_bg(_bga) %}
   <div class="g-bg" aria-hidden="true">
@@ -118,6 +121,7 @@
       <span class="g-foot__meta"><a href="{{ vendor.repo }}" target="_blank" rel="noopener">{{ vendor.product }}</a> · {{ vendor.version }} · based on <a href="{{ vendor.upstream_url }}" target="_blank" rel="noopener">{{ vendor.upstream }}</a> by <a href="{{ vendor.url }}" target="_blank" rel="noopener">{{ vendor.name }}</a></span>
     </div>
   </footer>
+  {% if wears_nova(_bga) %}<script src="{{ static_url('f/starfield.js') }}" defer></script>{% endif %}
   <script src="{{ static_url('f/facet.js') }}" defer></script>
   <script src="{{ static_url('f/gallery.js') }}" defer></script>
   {% block scripts %}{% endblock %}

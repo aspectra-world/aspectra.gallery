@@ -31,6 +31,12 @@ carries the fork's name.
   (`static/f/aspectra.css`; a site face from gallery.cfg still wins). The backdrop without a
   wallpaper is the moving starfield of aspectra.world (`static/f/starfield.js`, built from
   its `starfield.ts`, dark scheme only) instead of Nova; wallpapers per album stay.
+- Look of the admin: dressed like the aspectra.home dashboard (`console/static/aspectra.css`,
+  after `style.css`, before the look sheet): kit colours and faces, the wide sidebar with
+  the accent edge on the current place, panels as separate cards, the kit's buttons and the
+  dot grid as backdrop. The wordmark is written in lower case.
+- Header logo: the Saturn of aspectra.world (`logo/saturn.png`) unless gallery.cfg names a
+  logo; the tab icon stays the gallery icon of the brand kit.
 
 ## Planned
 

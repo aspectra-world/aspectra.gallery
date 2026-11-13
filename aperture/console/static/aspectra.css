@@ -1,7 +1,10 @@
 /* aspectra.gallery: the admin in the aspectra brand kit's colours and faces, the
    counterpart of gallery/static/f/aspectra-tokens.css + aspectra.css. Loaded after
    style.css and before the look sheet (/theme.css), so an accent set in gallery.cfg
-   still wins. The admin is dark only, so these are the kit's dark values. */
+   still wins. The admin is dark only, so these are the kit's dark values.
+   The second half dresses the admin like the aspectra.home dashboard: its sidebar,
+   top bar, panels, buttons and dot grid (values from aspectra.home styles/shell.css
+   and base.css, --frame-* there). */
 @font-face{ font-family:'Manrope'; src:url('/static/fonts/Manrope-400.woff2') format('woff2'); font-weight:400; font-style:normal; font-display:swap }
 @font-face{ font-family:'Manrope'; src:url('/static/fonts/Manrope-500.woff2') format('woff2'); font-weight:500; font-style:normal; font-display:swap }
 @font-face{ font-family:'Manrope'; src:url('/static/fonts/Manrope-600.woff2') format('woff2'); font-weight:600 700; font-style:normal; font-display:swap }
@@ -33,10 +36,73 @@
 /* headings in Space Grotesk, as on aspectra.world; running text stays Manrope */
 h1, h2, h3, .head__title, .login__title, .card__title, .group__title, .subnav__title{ font-family: var(--head) }
 
-/* the moving starfield of aspectra.world in place of the drawn backdrop; it brings
-   its own darkness, so the bloom and the dim of .site-bg::after stay off */
-.site-bg--stars::after{ display:none }
-.site-bg__stars{ position:absolute; inset:0; width:100%; height:100%; display:block }
-
 /* the wordmark as aspectra.world writes it: lower case, Space Grotesk 600 */
 .brand-name, .boot__name{ text-transform:none; letter-spacing:.01em; font-weight:600 }
+
+/* ================= the aspectra.home frame ================= */
+:root{
+  --surface-border: rgb(255 255 255 / .07);
+  --surface-hover: #121722;
+  --line: var(--surface-border);
+  --line-strong: rgb(255 255 255 / .14);
+  --radius: 14px;
+  --pane: color-mix(in srgb, var(--bg) 88%, transparent);
+  --glass: var(--surface);
+  --glass-hi: color-mix(in srgb, var(--surface) 70%, var(--bg));
+  --frame-panel: linear-gradient(180deg, color-mix(in srgb, var(--text) 3%, var(--surface)) 0%, var(--surface) 120px);
+  --frame-edge: inset 0 1px 0 color-mix(in srgb, var(--text) 7%, transparent);
+  --frame-shadow: 0 1px 2px rgb(0 0 0 / .25), 0 8px 24px rgb(0 0 0 / .18);
+}
+
+/* the dot grid of aspectra.home instead of a picture */
+.site-bg--grid::after{ display:none }
+.site-bg--grid::before{ content:""; position:absolute; inset:0;
+  background-image: radial-gradient(rgb(181 169 235 / .16) 1px, transparent 1.4px);
+  background-size: 24px 24px;
+  -webkit-mask-image: linear-gradient(to bottom, #000 0%, rgb(0 0 0 / .4) 55%, transparent 100%);
+          mask-image: linear-gradient(to bottom, #000 0%, rgb(0 0 0 / .4) 55%, transparent 100%) }
+
+/* top bar */
+.nav, .pane__top{ background-color: var(--pane); border-bottom-color: var(--surface-border) }
+.cmdk{ height:38px; border-radius:10px; border-color:var(--surface-border); background:var(--surface); color:var(--text-subtle, #8b93a3) }
+.cmdk:hover{ border-color: color-mix(in srgb, var(--acc) 40%, var(--surface-border)); color:var(--text) }
+
+/* sidebar: wide as aspectra.home's above 900 px; below that the original's narrow
+   rail and, on a phone, its strip under the bar stay as they are */
+.rail{ background-color: var(--glass-hi); backdrop-filter:none; -webkit-backdrop-filter:none; border-right-color: var(--surface-border) }
+.rail__link{ color:#9aa3b2 }
+.rail__link:hover{ background:var(--surface-hover); color:var(--text) }
+.rail__link.is-active > .fa{ color: var(--acc) }
+@media (min-width: 621px){
+  .rail{ padding: 16px 12px }
+  .rail__nav{ display:grid; gap:2px }
+  .rail__link{ height:38px; border-radius:10px; font-size:.875rem }
+  .rail__link.is-active{ background: color-mix(in srgb, var(--acc) 14%, transparent); box-shadow: inset 2px 0 0 var(--acc); color:var(--text) }
+}
+@media (min-width: 901px){
+  :root{ --rail-w: 252px }
+  .rail__link{ padding:0 12px; gap:12px }
+}
+
+/* panels: separate cards on the grid, as the dashboard's tiles */
+.bento{ gap:16px; border:0; background:none; backdrop-filter:none; -webkit-backdrop-filter:none }
+.bento__cell{ border:0 }
+.card, .bento__cell > .card{ border:1px solid var(--surface-border); border-radius:var(--radius);
+  background: var(--frame-panel); box-shadow: var(--frame-edge), var(--frame-shadow);
+  backdrop-filter:none; -webkit-backdrop-filter:none }
+.card__head{ padding:16px 24px; border-bottom-color: var(--surface-border) }
+.card__title{ font-family: var(--sans); font-size:.875rem; font-weight:600; letter-spacing:0 }
+.bento .todo{ border-top-color: var(--surface-border) }
+.todo__item{ border-right-color: var(--surface-border) }
+
+/* buttons as the kit draws them */
+.btn{ border-radius:10px; background: rgb(78 155 214 / .12); border:1px solid rgb(78 155 214 / .3);
+  backdrop-filter:none; -webkit-backdrop-filter:none; font-family: var(--sans); letter-spacing:0; text-transform:none }
+.btn:hover:not(:disabled){ background: rgb(78 155 214 / .22); border-color: rgb(78 155 214 / .6) }
+.btn--ghost{ background:none; border-color:transparent }
+.btn--ghost:hover:not(:disabled){ background: var(--surface-hover); border-color:transparent }
+.btn--primary{ background: color-mix(in srgb, var(--acc) 22%, transparent); border-color: color-mix(in srgb, var(--acc) 60%, transparent); color: var(--text) }
+.btn--primary:hover:not(:disabled){ background: color-mix(in srgb, var(--acc) 32%, transparent) }
+
+/* footer */
+.foot{ background: var(--glass-hi); border-top-color: var(--surface-border) }

@@ -29,7 +29,7 @@
 <body class="login-body">
   {# The same backdrop the console wears, so signing in is the same room and
      not a lobby someone else built. #}
-  <div class="site-bg site-bg--stars" aria-hidden="true"><canvas class="site-bg__stars" data-starfield></canvas></div>
+  <div class="site-bg site-bg--grid" aria-hidden="true"></div>
 
   <main class="login">
     <form class="login__card" id="login-form" method="post" action="/api/session"
@@ -111,6 +111,5 @@
   </main>
 
   <script src="{{ static_url('login.js') }}"></script>
-  <script src="{{ static_url('starfield.js') }}" defer></script>
 </body>
 </html>

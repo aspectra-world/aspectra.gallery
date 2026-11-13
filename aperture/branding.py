@@ -71,7 +71,10 @@ BRAND_CACHE_DIR = settings.data_dir / "brand"
 BRAND_DEFAULT_NAME = "aspectra.gallery"
 
 # the unbranded mark, shipped so a gallery that names no logo still has one
-BRAND_DEFAULT_LOGO = "logo/gallery-mark.svg"
+# aspectra.gallery: the header wears the Saturn of aspectra.world, the tab keeps the
+# gallery icon of the brand kit.
+BRAND_DEFAULT_LOGO = "logo/saturn.png"
+BRAND_DEFAULT_FAVICON = "logo/gallery-mark.svg"
 
 
 def brand_file(name: str) -> Path | None:
@@ -178,9 +181,9 @@ def site_brand(lang: str = i18n.DEFAULT_LANG) -> dict:
     logo = _brand_asset("logo", cfg)
     favicon = _brand_asset("favicon", cfg) or logo
     if logo is None:
-        logo = {"url": templating.static_url(templating.WEB_DIR, BRAND_DEFAULT_LOGO), "type": "image/svg+xml"}
+        logo = {"url": templating.static_url(templating.WEB_DIR, BRAND_DEFAULT_LOGO), "type": "image/png"}
     if favicon is None:
-        favicon = logo
+        favicon = {"url": templating.static_url(templating.WEB_DIR, BRAND_DEFAULT_FAVICON), "type": "image/svg+xml"}
     return {
         "name": name,
         "sub": sub,

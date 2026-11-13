@@ -46,7 +46,7 @@
      Where the gallery plays a clip, this plays nothing: a config tool has no
      business decoding 1080p behind a form. Vector stills cost nothing, which
      is the whole reason a backdrop is affordable here at all. #}
-  <div class="site-bg site-bg--stars" aria-hidden="true"><canvas class="site-bg__stars" data-starfield></canvas></div>
+  <div class="site-bg site-bg--grid" aria-hidden="true"></div>
 
   {# The boot screen, and the script that drives it, at the TOP of the body
      on purpose: splash.js puts `is-booting` on <html> the moment it runs,
@@ -204,6 +204,5 @@
   <script src="{{ static_url('tools.js') }}"></script>
   <script src="{{ static_url('charts.js') }}"></script>
   <script src="{{ static_url('app.js') }}"></script>
-  <script src="{{ static_url('starfield.js') }}" defer></script>
 </body>
 </html>

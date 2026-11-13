@@ -21,11 +21,14 @@ def test_about_names_the_build_the_repository_and_the_maker(console):
     body = console.get("/api/about").json()
     assert body["product"] == brand.PRODUCT
     assert body["version"] == brand.VERSION
-    assert body["repo"] == "https://github.com/lucya-astralis/gallery"
-    assert body["maker"] == {"name": "lucya.sh", "url": "https://lucya.sh",
-                             "pfp": "/static/maker.webp"}
-    assert body["vendor"] == {"name": "lucya.systems", "url": "https://lucya.systems"}
-    assert body["design"]["name"] == "Nebula" and body["design"]["url"].endswith("/nebula")
+    # the fork's own repository and maker, the original named beside them (NOTICE)
+    assert body["repo"] == "https://github.com/aspectra-world/aspectra.gallery"
+    assert body["maker"] == {"name": "aspectra.world", "url": "https://aspectra.world",
+                             "pfp": None}
+    assert body["vendor"] == {"name": "lucya.systems", "url": "https://lucya.systems",
+                              "upstream": "Aperture",
+                              "upstream_url": "https://github.com/lucya-astralis/gallery"}
+    assert body["design"]["name"] == "aspectra"
 
 
 def test_the_notes_are_every_release_newest_first(console):
@@ -51,10 +54,9 @@ def test_a_relative_link_points_at_the_repository():
     assert "<hr" not in release["html"] and "Not a release" not in release["html"]
 
 
-def test_the_maker_picture_is_served(console):
-    res = console.get("/static/maker.webp")
-    assert res.status_code == 200
-    assert res.headers["content-type"] == "image/webp"
+def test_there_is_no_maker_picture(console):
+    # The original showed its author's picture here; a fork does not wear it.
+    assert console.get("/static/maker.webp").status_code == 404
 
 
 def test_the_notes_stay_behind_the_door(indexed):

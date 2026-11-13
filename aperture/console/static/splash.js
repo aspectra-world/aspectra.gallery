@@ -69,12 +69,12 @@
    * (~1250-1450 user units/sec); the tail is the deliberate exception,
    * slower, because it is the opening beat with nothing else on screen to
    * race. */
+  // aspectra.gallery: the Saturn (see _mark.html) -- the ring behind, the
+  // planet, the ring in front, so it assembles the way it is layered.
   const order = [
-    { pieces: ['tail'], dur: 0.66 },                    // 579u  -> ~880 u/s
-    { pieces: ['head'], dur: 0.46 },                    // 574u  -> ~1250
-    { pieces: ['wing-l', 'wing-r'], dur: 0.86 },        // 1245u -> ~1450
-    { pieces: ['mid-l', 'mid-r'], dur: 0.46 },          // 622u  -> ~1350
-    { pieces: ['small-l', 'small-r'], dur: 0.36 },      // 481u  -> ~1340
+    { pieces: ['ring-back'], dur: 0.5 },
+    { pieces: ['planet'], dur: 0.6 },
+    { pieces: ['ring-front'], dur: 0.5 },
   ];
   const piecesOf = (group) => group.pieces
     .map((id) => svg.querySelector('[data-piece="' + id + '"]'))

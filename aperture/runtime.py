@@ -272,7 +272,7 @@ def _refuse_dir(directory: Path, exc: OSError) -> SystemExit:
     who = ("uid %d, gid %d" % (os.getuid(), os.getgid())) if me else "the current user"
     return SystemExit(
         "\n"
-        "  Aperture cannot create %s\n"
+        "  The admin cannot create %s\n"
         "      %s\n"
         "\n"
         "  This process runs as %s.\n"

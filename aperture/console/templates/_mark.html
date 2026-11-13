@@ -1,50 +1,30 @@
 {#- ==================================================================
     THE MARK
 
-    The eight polygons of the lucya wing, lifted unchanged out of
-    logo/lucya_logo.svg. It is inline SVG rather than an <img> for one
-    reason: an <img> is a closed document, and nothing outside it can
-    reach a path — no stylesheet of ours, no script of ours. The boot
-    screen draws this mark one piece at a time and the header splits it
-    into colour on hover, and neither is possible through an <img>.
-
-    `ghosts` adds two more copies of the wing, offset a couple of units
-    and blended to screen. That is the chromatic split — the RGB fringe
-    the animation is built on — and it is markup rather than a filter
-    because a filter is the expensive way to get the same edge. The
-    footer's mark does not move and does not pay for them.
-
-    `product` swaps the wing for the product's own mark, the aperture
-    closed down (brand kit, logo/products/aperture-mark-*.svg): the bar and
-    the door name the product, the boot screen and the footer keep the
-    house's eagle. It is a square, so it takes .mark--square, and it
-    splits on hover exactly as the wing does.
+    aspectra.gallery wears the Saturn of the aspectra brand kit here, not
+    the original author's wing or aperture: a fork keeps the attribution
+    but not the marks (TRADEMARKS.md, NOTICE). Three filled shapes on a
+    100-unit square -- the back half of the ring, the planet in front of
+    it, the front half of the ring -- so the boot screen can still draw it
+    one piece at a time and the header can still split it into colour.
+    It is inline SVG for the same reason as before: an <img> is a closed
+    document, and nothing outside it can reach a path.
     ================================================================== -#}
 
-{%- macro pieces(cls) -%}
-      <path class="{{ cls }}" data-piece="wing-l" d="M112,148L260,217L409.69,379.66L467.26,264.53L400,222.08L400,204.02L0,0L112,148Z"/>
-      <path class="{{ cls }}" data-piece="wing-r" d="M964,0L564,204.02L564,222.08L496.74,264.53L554.31,379.66L704,217L852,148L964,0Z"/>
-      <path class="{{ cls }}" data-piece="mid-l" d="M172.93,266.68L315.8,308.65L247.36,234.28L59.81,146.84L172.93,266.68Z"/>
-      <path class="{{ cls }}" data-piece="mid-r" d="M904.19,146.84L716.64,234.28L648.2,308.65L791.07,266.68L904.19,146.84Z"/>
-      <path class="{{ cls }}" data-piece="small-l" d="M289.78,367.82L400.19,400.35L343.4,338.64L191.3,293.96L289.78,367.82Z"/>
-      <path class="{{ cls }}" data-piece="small-r" d="M772.7,293.96L620.6,338.64L563.81,400.35L674.22,367.82L772.7,293.96Z"/>
-      <path class="{{ cls }}" data-piece="head" d="M518,67L415,100L403,120L454,122L421,210.5L482,249L543,210.5L538,85L518,67Z"/>
-      <path class="{{ cls }}" data-piece="tail" d="M482,282L544.5,407L482,543L419.5,407L482,282Z"/>
-{%- endmacro -%}
-
-{%- macro blades(cls) -%}
-      <path class="{{ cls }}" data-piece="blade-1" d="M53.29,7.21L61.74,36.74L66.55,48.62L87.49,26.95Z"/>
-      <path class="{{ cls }}" data-piece="blade-2" d="M88.7,31.45L67.36,53.54L59.47,63.64L88.7,70.94Z"/>
-      <path class="{{ cls }}" data-piece="blade-3" d="M85.42,74.24L55.61,66.8L42.92,65.02L51.22,93.99Z"/>
-      <path class="{{ cls }}" data-piece="blade-4" d="M46.71,92.79L38.26,63.26L33.45,51.38L12.51,73.05Z"/>
-      <path class="{{ cls }}" data-piece="blade-5" d="M11.3,68.55L32.64,46.46L40.53,36.36L11.3,29.06Z"/>
-      <path class="{{ cls }}" data-piece="blade-6" d="M14.58,25.76L44.39,33.2L57.08,34.98L48.78,6.01Z"/>
+{%- macro saturn(cls) -%}
+      <g transform="translate(50 50) rotate(-18)">
+        <path class="{{ cls }}" data-piece="ring-back" d="M-45,0 A45,14 0 0 1 45,0 L40,0 A40,10 0 0 0 -40,0 Z"/>
+      </g>
+      <path class="{{ cls }}" data-piece="planet" d="M29,50 A21,21 0 1 0 71,50 A21,21 0 1 0 29,50 Z"/>
+      <g transform="translate(50 50) rotate(-18)">
+        <path class="{{ cls }}" data-piece="ring-front" d="M-45,0 A45,14 0 0 0 45,0 L40,0 A40,10 0 0 1 -40,0 Z"/>
+      </g>
 {%- endmacro -%}
 
 {%- macro mark(cls='', ghosts=false, product=false) -%}
-{%- set draw = blades if product else pieces -%}
-{%- set box = "0 0 100 100" if product else "0 0 964 543" -%}
-<span class="mark {{ cls }}{% if product %} mark--square{% endif %}" aria-hidden="true">
+{%- set draw = saturn -%}
+{%- set box = "0 0 100 100" -%}
+<span class="mark {{ cls }} mark--square" aria-hidden="true">
   <svg class="mark__svg" viewBox="{{ box }}" focusable="false">
 {{ draw('piece') }}
   </svg>

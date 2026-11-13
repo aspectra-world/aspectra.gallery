@@ -1,3 +1,8 @@
+> **aspectra.gallery** is a modified version of [Aperture](https://github.com/lucya-astralis/gallery)
+> by [lucya.systems](https://lucya.systems), run at gallery.aspectra.world. What is different
+> from the original is in [FORK.md](FORK.md); the rest of this README is the original's and
+> still describes how it works. Licence: AGPL-3.0 with the terms in [NOTICE](NOTICE).
+
 # lucya.systems aperture
 
 One app, two surfaces, two ports.

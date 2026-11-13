@@ -514,7 +514,7 @@ const SYSTEM_GROUPS = [
     ['export', 'Backup', 'fa-box-archive'],
     ['activity', 'Activity', 'fa-clock-rotate-left'],
   ]],
-  ['Aperture', [
+  ['Admin', [
     ['access', 'Password', 'fa-key'],
     ['about', 'About', 'fa-scroll'],
   ]],
@@ -940,7 +940,7 @@ function paintIndexer(grid, st, ro) {
 
   grid.append(wide(card('fa-microchip', 'Indexer', 'the one writer of the index, whoever asks',
     indexerLive(st, 'ops'),
-    ro ? quiet('Aperture is mounted read-only. Nothing here can be started from the browser.') : null,
+    ro ? quiet('The admin is mounted read-only. Nothing here can be started from the browser.') : null,
     el('div', { class: 'card__actions' },
       el('button', {
         type: 'button', class: 'btn btn--primary', id: 'ops-scan',
@@ -1207,7 +1207,7 @@ function paintPrivacy(grid, st, ro) {
         onclick: () => startJob('gps_strip', { album: r.album },
           'Rewrite ' + hits + ' original photo(s) in place to remove their GPS block?\n\n' +
           'This changes the originals themselves. A scan of that scope is queued afterwards.') })));
-    body.push(quiet('This rewrites the photographs — the one job in Aperture that touches an original.'));
+    body.push(quiet('This rewrites the photographs — the one job in the admin that touches an original.'));
   }
   if (r.unreadable.length) {
     body.push(sub('unreadable', r.unreadable.length));
@@ -1243,14 +1243,14 @@ function paintOpsAccess(grid, st, ro) {
   const auth = st.auth || {};
   const isSet = auth.mode === 'password';
   grid.append(wide(card('fa-key', isSet ? 'Change the password' : 'Set a password',
-    isSet ? 'Aperture asks for it wherever it listens' : 'none is set — anyone who reaches this port can use Aperture',
+    isSet ? 'The admin asks for it wherever it listens' : 'none is set — anyone who reaches this port can use the admin',
     el('dl', { class: 'facts' },
       fact('Door', isSet ? 'password' : 'open', isSet ? 'ok' : 'warn'),
       fact('Listens on', auth.bind || '—'),
       fact('Without one', auth.may_run_open
         ? 'allowed here — loopback, or APERTURE_ALLOW_OPEN=1'
-        : 'not allowed — Aperture would refuse to start here')),
-    ro ? quiet('Aperture is mounted read-only.') : null,
+        : 'not allowed — the admin would refuse to start here')),
+    ro ? quiet('The admin is mounted read-only.') : null,
     el('div', { class: 'ops__form' },
       isSet ? opsInput('pw-current', { type: 'password', placeholder: 'current password', autocomplete: 'current-password', disabled: ro }) : null,
       opsInput('pw-new', { type: 'password', placeholder: 'new password — 8 characters or more', autocomplete: 'new-password', disabled: ro }),
@@ -1270,9 +1270,9 @@ function paintOpsAccess(grid, st, ro) {
          el('div', { class: 'card__actions' },
            el('button', { type: 'button', class: 'btn', icon: 'fa-lock-open', disabled: ro,
                           text: 'Remove the password', onclick: clearPassword })),
-         quiet('Aperture then runs open to anything that can reach ' + auth.bind + '.')]
-      : quiet('Aperture listens on ' + auth.bind + ', where it may not run without a password — ' +
-              'removing it would leave the door open until the next start, and then keep Aperture ' +
+         quiet('The admin then runs open to anything that can reach ' + auth.bind + '.')]
+      : quiet('The admin listens on ' + auth.bind + ', where it may not run without a password — ' +
+              'removing it would leave the door open until the next start, and then keep the admin ' +
               'from starting at all. Change it instead.'))));
 }
 
@@ -1293,7 +1293,7 @@ async function setPassword() {
 }
 
 async function clearPassword() {
-  if (!confirm('Remove the Aperture password? Anything that can reach this port can then use Aperture.')) return;
+  if (!confirm('Remove the admin password? Anything that can reach this port can then use the admin.')) return;
   try {
     await api('/api/ops/password', { method: 'DELETE',
       body: JSON.stringify({ current: opsState.inputs['pw-clear'] || '' }) });
@@ -1650,10 +1650,11 @@ async function renderChangelog() {
         el('a', { class: 'maker__repo', href: about.repo, ...outward, icon: 'fa-code-branch',
                   text: about.repo.replace(/^https?:\/\//, '') }))),
     el('dl', { class: 'facts maker__facts' },
-      vendor.name ? [el('dt', { text: 'Manufacturer' }), el('dd', {}, link(vendor.url, vendor.name))] : null,
+      vendor.name ? [el('dt', { text: 'Based on' }),
+        el('dd', {}, link(vendor.upstream_url, vendor.upstream), ' by ', link(vendor.url, vendor.name))] : null,
       design.name ? [el('dt', { text: 'Design' }),
         el('dd', {}, link(design.url, design.name),
-          el('span', { class: 'maker__note', text: ' — the design language both surfaces wear: a black ground, one accent, square glass.' }))] : null))));
+          el('span', { class: 'maker__note', text: ' — the design both surfaces wear: the starfield, the Saturn and one accent.' }))] : null))));
 
   const releases = about.releases || [];
   if (!releases.length) {
@@ -1952,7 +1953,7 @@ function paintHome() {
       el('button', { type: 'button', class: 'btn', icon: 'fa-rotate-right', text: 'Check again', onclick: checkAll }))), 'needs');
 
   /* ---- what happened here ---- */
-  put(4, 9, card('fa-clock-rotate-left', 'Recent changes', 'made in Aperture, not the gallery',
+  put(4, 9, card('fa-clock-rotate-left', 'Recent changes', 'made in the admin, not the gallery',
     !home.audit.length
       ? el('p', { class: 'card__quiet', text: 'Nothing has been saved here yet.' })
       : el('div', { class: 'hrows' }, home.audit.map((entry) => {

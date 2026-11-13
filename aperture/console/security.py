@@ -105,7 +105,7 @@ def set_password(password: str) -> Path:
     and not in the photo tree — see runtime.py.
     """
     if len(password) < 8:
-        raise ValueError("an Aperture password needs at least 8 characters")
+        raise ValueError("an admin password needs at least 8 characters")
     path = _cred_path()
     path.parent.mkdir(parents=True, exist_ok=True)
     tmp = path.with_suffix(".tmp")
@@ -194,8 +194,8 @@ def assert_safe_binding(bind: str | None = None, port: int | None = None) -> Non
 
     raise SystemExit(
         "\n"
-        "  Aperture has no password and is not bound to loopback.\n"
-        "  It is the only write path into the photo tree, so Aperture will\n"
+        "  The admin has no password and is not bound to loopback.\n"
+        "  It is the only write path into the photo tree, so the admin will\n"
         "  not open that socket.\n"
         "\n"
         "  Set a password (recommended):\n"
@@ -206,7 +206,7 @@ def assert_safe_binding(bind: str | None = None, port: int | None = None) -> Non
         "  published on 127.0.0.1, or a firewall covers it - say so:\n"
         "      APERTURE_ALLOW_OPEN=1\n"
         "\n"
-        "  Or turn Aperture off entirely:\n"
+        "  Or turn the admin off entirely:\n"
         "      APERTURE_ENABLED=0\n"
         f"\n  (bind={settings.console_bind}:{settings.console_port})\n"
     )
@@ -412,7 +412,7 @@ async def guard(request: Request, call_next):
 
     found = current(request)
     if found is None:
-        return _refuse(request, 401, "sign in to Aperture")
+        return _refuse(request, 401, "sign in to the admin")
 
     if request.method not in SAFE_METHODS:
         if not _same_origin(request):

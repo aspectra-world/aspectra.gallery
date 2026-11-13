@@ -55,19 +55,19 @@ def build_parser() -> argparse.ArgumentParser:
     add("term", cmd_term, "What this terminal supports, and why colour / the menu are off.")
 
     sp = add("passwd", cmd_passwd,
-             "Set, change or clear Aperture's operator password.")
+             "Set, change or clear the admin's operator password.")
     sp.add_argument("--stdin", action="store_true",
                     help="read the password from stdin instead of prompting")
     sp.add_argument("--clear", action="store_true",
-                    help="remove the password; Aperture then only starts "
+                    help="remove the password; the admin then only starts "
                          "on loopback or with APERTURE_ALLOW_OPEN=1")
 
     sp = add("lucent", cmd_lucent,
-             "Pair this Aperture with Lucent, show the pairing, or end it (beta).")
+             "Pair this gallery with Lucent, show the pairing, or end it (beta).")
     sp.add_argument("action", nargs="?", choices=("status", "join", "leave"), default="status")
     sp.add_argument("url", nargs="?", help="join: the Lucent address, e.g. https://lucent.example")
     sp.add_argument("code", nargs="?", help="join: the one-time code from Lucent > Tools")
-    sp.add_argument("--ui-url", help="where a browser opens this Aperture (default: its bind and port)")
+    sp.add_argument("--ui-url", help="where a browser opens this gallery (default: its bind and port)")
     sp.add_argument("--base-url", help="where Lucent reaches it, when that differs from --ui-url")
 
     add("status", cmd_status, "Live state: server, pause, last scan, watcher queue, index counters.")

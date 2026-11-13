@@ -594,7 +594,7 @@ def columns(pairs, gap: int = 2, key_tint: str = "") -> None:
 #
 # The PNG is built from the site logo by `python tools/render_logo.py`; when
 # it is missing (or nothing can display it) the ASCII masthead below is used.
-LOGO_PNG = Path(__file__).parent / "gallery" / "static" / "logo" / "lucya_logo.png"
+LOGO_PNG = Path(__file__).parent / "gallery" / "static" / "logo" / "saturn.png"
 LOGO_IMAGE_COLS = 32
 _KITTY_CHUNK = 4096
 

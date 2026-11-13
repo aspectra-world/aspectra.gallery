@@ -115,7 +115,7 @@
       {% if brand.badges %}
       <div class="g-foot__badges">{% for badge in brand.badges %}<img src="{{ badge.url }}" width="88" height="31" alt="{{ badge.label }}" title="{{ badge.label }}">{% endfor %}</div>
       {% endif %}
-      <span class="g-foot__meta"><a href="{{ vendor.url }}" target="_blank" rel="noopener">{{ vendor.product }}</a> · {{ vendor.version }}</span>
+      <span class="g-foot__meta"><a href="{{ vendor.repo }}" target="_blank" rel="noopener">{{ vendor.product }}</a> · {{ vendor.version }} · based on <a href="{{ vendor.upstream_url }}" target="_blank" rel="noopener">{{ vendor.upstream }}</a> by <a href="{{ vendor.url }}" target="_blank" rel="noopener">{{ vendor.name }}</a></span>
     </div>
   </footer>
   <script src="{{ static_url('f/facet.js') }}" defer></script>

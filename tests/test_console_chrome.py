@@ -23,13 +23,12 @@ def test_the_mark_is_markup_now_and_not_a_picture(console):
     page = console.get("/").text
     assert page.count('class="mark ') == 3          # nav, footer, boot
     assert 'mark--nav' in page and 'mark--foot' in page and 'mark--splash' in page
-    # the boot screen and the footer draw the house's eagle, piece by piece;
-    # the bar names the product with its own mark, the aperture
-    assert page.count('data-piece="tail"') >= 2
-    assert 'mark--nav mark--square' in page and page.count('data-piece="blade-1"') >= 1
+    # every mark is the aspectra Saturn, three pieces each (not the original's marks)
+    assert page.count('data-piece="planet"') >= 3
+    assert 'mark--nav mark--square' in page and 'data-piece="tail"' not in page
     # and the product's flat file is the favicon -- a 16px tab icon wants
     # the file, not a handful of paths
-    assert 'logo/aperture.svg' in page
+    assert 'logo/gallery.svg' in page
 
 
 def test_the_boot_screen_is_hidden_until_a_script_shows_it(console):
@@ -99,7 +98,7 @@ def test_the_door_stamps_the_version(console):
         page = console.get("/login").text
         assert brand.VERSION in page
         # in the lockup, not loose on the page
-        assert re.search(r'brand-sub">aperture <b>' + re.escape(brand.VERSION),
+        assert re.search(r'brand-sub">admin <b>' + re.escape(brand.VERSION),
                          page)
     finally:
         security.clear_password()

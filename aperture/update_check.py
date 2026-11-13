@@ -151,7 +151,8 @@ def status(*, fresh: bool = False, now: float | None = None) -> dict:
     when `fresh` and the last ask is more than MIN_GAP old)."""
     global _last, _at
     base = {"current": brand.VERSION, "source": settings.update_url}
-    if not settings.update_check:
+    # No address to ask (the fork's default, see brand.UPDATE_URL) is the same as off.
+    if not settings.update_check or not settings.update_url:
         return {**base, "state": "off", "latest": None, "error": None, "checked_at": None}
     now = time.time() if now is None else now
     # One ask at a time: a second tab arriving mid-ask waits for its answer

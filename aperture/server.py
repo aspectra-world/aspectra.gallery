@@ -6,7 +6,7 @@
     APERTURE_ROLE=public python -m aperture
     APERTURE_ROLE=aperture python -m aperture
 
-"Everything in one" and "Aperture on its own port" are not in tension: one
+"Everything in one" and "Admin on its own port" are not in tension: one
 process serves both, but each surface is its own ASGI app on its own listener,
 and the port is where the two trust levels part. Nothing routes between them —
 a request that arrives on the public socket cannot reach an Aperture route,
@@ -78,7 +78,7 @@ def _configs() -> list[uvicorn.Config]:
                 raise                      # console-only: there is nothing left to serve
             log.error("%s", refused)
             log.error("aperture: NOT opening on %s:%d. The gallery is serving; "
-                      "fix the above and restart to get Aperture back.",
+                      "fix the above and restart to get the admin back.",
                       settings.console_bind, settings.console_port)
         else:
             out.append(uvicorn.Config(

@@ -200,7 +200,7 @@ def _writes(request: Request, action: str, target: Path, before: str | None) -> 
 # ----- helpers ----------------------------------------------------------
 def _guard_write() -> None:
     if settings.console_read_only:
-        raise HTTPException(403, "Aperture is mounted read-only")
+        raise HTTPException(403, "The admin is mounted read-only")
 
 
 def _album_or_400(album: str) -> str:
@@ -301,9 +301,9 @@ async def _json_body(request: Request) -> dict:
 LOGIN_REASONS = {
     "timeout": "That session had been idle for %d minutes, so it ended."
                % (security.IDLE_TIMEOUT // 60),
-    "signout": "Signed out. Aperture is closed until you sign in again.",
+    "signout": "Signed out. The admin is closed until you sign in again.",
     "expired": "That session reached its twelve-hour limit and ended.",
-    "password": "The Aperture password was changed, which ends every session. "
+    "password": "The admin password was changed, which ends every session. "
                 "Sign in with the new one.",
     "lucent": "Signing in through Lucent did not work. The log says why; "
               "the operator password still opens the door.",
@@ -391,7 +391,7 @@ def api_session(request: Request):
 @app.post("/api/session")
 async def api_session_open(request: Request):
     if security.open_access():
-        raise HTTPException(409, "this Aperture has no password set")
+        raise HTTPException(409, "this gallery has no password set")
     body = await _json_body(request)
     password = body.get("password")
     if not isinstance(password, str) or not password:
@@ -431,6 +431,8 @@ def index(request: Request):
         "photos_dir": settings.photos_dir.as_posix(),
         "read_only": settings.console_read_only,
         "app_version": brand.VERSION,
+        # for the footer's attribution to the original (NOTICE)
+        "vendor": brand.CONTEXT,
         # "open" means no password is configured. The UI says so out loud —
         # an unauthenticated console should never look like an authenticated
         # one (see security.assert_safe_binding).
@@ -529,8 +531,10 @@ def api_about():
             "url": brand.MAKER_URL,
             "pfp": "/static/maker.webp" if MAKER_PFP.is_file() else None,
         },
-        # the label it ships under, and the design language it wears
-        "vendor": {"name": brand.NAME, "url": brand.URL},
+        # what this fork is based on (NOTICE: the original author is named
+        # beside the fork, never replaced by it), and the design language it wears
+        "vendor": {"name": brand.NAME, "url": brand.URL,
+                   "upstream": brand.UPSTREAM, "upstream_url": brand.UPSTREAM_URL},
         "design": {"name": brand.DESIGN_NAME, "url": brand.DESIGN_URL},
         "releases": _release_notes(text),
     }

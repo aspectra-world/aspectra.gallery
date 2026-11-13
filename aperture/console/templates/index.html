@@ -5,8 +5,8 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="color-scheme" content="dark">
-  <title>Aperture — lucya.systems</title>
-  <link rel="icon" type="image/svg+xml" href="{{ static_url('logo/aperture.svg') }}">
+  <title>Admin · aspectra.gallery</title>
+  <link rel="icon" type="image/svg+xml" href="{{ static_url('logo/gallery.svg') }}">
   <link rel="stylesheet" href="{{ static_url('style.css') }}">
   {# NEBULA_FACES=1: the gallery's own font sheet, served from where it
      lives -- see app.py. gallery.cfg `faces`, NEBULA_FACES its default. #}
@@ -67,7 +67,7 @@
     <div class="boot__stage">
       {{ brandmark.mark('mark--splash', ghosts=true) }}
       <p class="boot__label" id="boot-label">
-        <span class="boot__name" id="boot-name">lucya.systems</span>
+        <span class="boot__name" id="boot-name">aspectra.gallery</span>
         <span class="boot__sub">aperture <b>{{ app_version }}</b></span>
       </p>
     </div>
@@ -94,8 +94,8 @@
       <a class="nav__brand" href="/" data-go>
         {{ brandmark.mark('mark--nav', ghosts=true, product=true) }}
         <span class="brand-text">
-          <span class="brand-name">lucya.systems</span>
-          <span class="brand-sub">aperture</span>
+          <span class="brand-name">aspectra.gallery</span>
+          <span class="brand-sub">admin</span>
         </span>
       </a>
 
@@ -142,10 +142,12 @@
   <footer class="foot">
     <div class="foot__brand">
       {{ brandmark.mark('mark--foot') }}
-      <span class="foot__wordmark">lucya.systems</span>
+      <span class="foot__wordmark">aspectra.gallery</span>
     </div>
     <div class="foot__meta">
       <span class="foot__bit foot__bit--keep"><b>Version</b> {{ app_version }}</span>
+      <span class="foot__bit">based on <a href="{{ vendor.upstream_url }}" target="_blank" rel="noopener">{{ vendor.upstream }}</a>
+        by <a href="{{ vendor.url }}" target="_blank" rel="noopener">{{ vendor.name }}</a></span>
       <span class="foot__bit"><b>Photos</b> {{ photos_dir }}</span>
     </div>
   </footer>

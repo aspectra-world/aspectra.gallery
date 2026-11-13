@@ -26,7 +26,7 @@ INTERESTING = [
     ("LensModel", "Lens"),
     ("DateTimeOriginal", "Taken"),
     ("ExposureTime", "Exposure"),
-    ("FNumber", "Aperture"),
+    ("FNumber", "Admin"),
     ("ISOSpeedRatings", "ISO"),
     ("FocalLength", "Focal length"),
     ("FocalLengthIn35mmFilm", "Focal length (35mm)"),

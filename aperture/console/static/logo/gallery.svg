@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64" fill="none">
+  <defs>
+    <radialGradient id="pl" cx="0.34" cy="0.28" r="0.85"><stop offset="0" stop-color="#ddd6f7"/><stop offset="0.55" stop-color="#b5a9eb"/><stop offset="1" stop-color="#7466b5"/></radialGradient>
+    <linearGradient id="rg" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#ddd6f7" stop-opacity="0.12"/><stop offset="0.5" stop-color="#ddd6f7"/><stop offset="1" stop-color="#ddd6f7" stop-opacity="0.12"/></linearGradient>
+    <linearGradient id="tl" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#171c28"/><stop offset="1" stop-color="#0a0d14"/></linearGradient>
+    <pattern id="dt" width="4" height="4" patternUnits="userSpaceOnUse"><circle cx="2" cy="2" r="0.45" fill="#b5a9eb" fill-opacity="0.22"/></pattern>
+  </defs>
+  <rect x="1" y="1" width="62" height="62" rx="15" fill="url(#tl)"/>
+  <rect x="1" y="1" width="62" height="62" rx="15" fill="url(#dt)"/>
+  <rect x="1.5" y="1.5" width="61" height="61" rx="14.5" stroke="#ffffff" stroke-opacity="0.09"/>
+  <g class="ring" transform="rotate(-16 32 38)"><path d="M5 38 A27 6 0 0 1 59 38" stroke="url(#rg)" stroke-width="2" stroke-linecap="round" opacity="0.5"/></g>
+  <circle cx="32" cy="30" r="14" fill="url(#pl)"/>
+  <circle cx="32" cy="30" r="13.6" stroke="#ffffff" stroke-opacity="0.22" stroke-width="0.6"/>
+  <g transform="translate(24 22) scale(0.667)"><path d="M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z" stroke="#0b0e15" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></g>
+  <g class="ring" transform="rotate(-16 32 38)"><path d="M5 38 A27 6 0 0 0 59 38" stroke="#121620" stroke-width="4.6" stroke-linecap="round"/><path d="M5 38 A27 6 0 0 0 59 38" stroke="url(#rg)" stroke-width="2.2" stroke-linecap="round"/></g>
+</svg>

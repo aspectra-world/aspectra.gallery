@@ -36,7 +36,9 @@ def asks(monkeypatch):
 
     monkeypatch.setattr(update_check, "_fetch", fake)
     update_check.reset()
-    with override(update_check=True):
+    # aspectra.gallery asks nobody by default (brand.UPDATE_URL is empty), so
+    # the tests name a place to ask, as an operator would with UPDATE_URL.
+    with override(update_check=True, update_url="https://example.invalid/api/version"):
         yield box
     update_check.reset()
 
@@ -108,7 +110,7 @@ def test_the_console_route_answers(console, asks):
     asks["answer"] = {"version": _bump(brand.VERSION, "minor")}
     body = console.get("/api/updates").json()
     assert body["state"] == "available"
-    assert body["source"] == brand.UPDATE_URL
+    assert body["source"] == "https://example.invalid/api/version"   # the address the fixture names
 
 
 def test_the_route_stays_behind_the_door(indexed):
@@ -134,5 +136,10 @@ def test_every_gallery_says_which_aperture_it_runs(client):
     assert any(e["path"] == "/api/version" for e in client.get("/api").json()["endpoints"])
 
 
-def test_the_maker_gallery_is_the_default_source():
-    assert brand.UPDATE_URL == "https://images.lucya.sh/api/version"
+def test_a_fork_asks_nobody_by_default():
+    # The original asks its author's gallery; this fork has nothing to learn
+    # there, its releases come in by git. No address is the same as off.
+    assert brand.UPDATE_URL == ""
+    update_check.reset()
+    with override(update_check=True, update_url=""):
+        assert update_check.status()["state"] == "off"

@@ -44,26 +44,32 @@ picture. Attribution belongs in the chrome, the headers and the metadata,
 which is where all eight of these live.
 """
 
+# aspectra.gallery is a modified version of Aperture by lucya.systems (AGPL-3.0
+# with the additional terms in NOTICE). Those terms ask a fork for its own name
+# (TRADEMARKS.md) and to keep the attribution beside it, never in its place:
+# NAME and URL below stay the original author's and travel with every page,
+# the footer and /humans.txt; PRODUCT is the fork's.
 NAME = "lucya.systems"
 URL = "https://lucya.systems"
-PRODUCT = f"{NAME} aperture"
+UPSTREAM = "Aperture"
+UPSTREAM_URL = "https://github.com/lucya-astralis/gallery"
+PRODUCT = "aspectra.gallery"
+BASED_ON = f"based on {UPSTREAM} by {NAME}"
 
-# Where the code lives and who makes it. Aperture's Changelog place shows
-# both next to the release notes: the maker is the person behind the software,
-# the vendor above is the label it ships under.
-REPO_URL = "https://github.com/lucya-astralis/gallery"
-MAKER_NAME = "lucya.sh"
-MAKER_URL = "https://lucya.sh"
+# Where the code of THIS version lives (AGPL section 13: whoever uses it over
+# the network can get its source there) and who makes it. The admin's Changelog
+# place shows both next to the release notes, with the original beside them.
+REPO_URL = "https://github.com/aspectra-world/aspectra.gallery"
+MAKER_NAME = "aspectra.world"
+MAKER_URL = "https://aspectra.world"
 # The design language both surfaces wear, and where it is kept on its own.
-DESIGN_NAME = "Nebula"
-DESIGN_URL = "https://github.com/lucya-astralis/nebula"
+DESIGN_NAME = "aspectra"
+DESIGN_URL = "https://aspectra.world"
 
-# Where a running aperture asks whether there is a newer one: the maker's own
-# gallery, which always runs the newest release and says so at /api/version
-# like every gallery does. Aperture shows the answer and
-# aperture/update_check.py is the whole of it; UPDATE_CHECK=0 turns it off and
-# UPDATE_URL points it elsewhere.
-UPDATE_URL = "https://images.lucya.sh/api/version"
+# Where a running gallery asks whether there is a newer one. Upstream asks the
+# original author's own gallery; a fork has nothing to learn there (its releases
+# come in by git), so it asks nobody unless UPDATE_URL names a place.
+UPDATE_URL = ""
 
 # Aperture's own release version — THE one place it is written. The nav, the
 # footer, /humans.txt, X-Powered-By, <meta name="generator">, the EXIF
@@ -87,7 +93,7 @@ VERSION = "3.2.0"
 # and the EXIF `Software` tag so all three can never drift apart.
 GENERATOR = f"{PRODUCT} {VERSION}"
 # outbound requests identify themselves as the product, not as a browser
-USER_AGENT = "lucya.systems-aperture"
+USER_AGENT = "aspectra.gallery"
 
 # what templates get as `vendor`
 CONTEXT = {
@@ -96,4 +102,7 @@ CONTEXT = {
     "product": PRODUCT,
     "version": VERSION,
     "generator": GENERATOR,
+    "upstream": UPSTREAM,
+    "upstream_url": UPSTREAM_URL,
+    "repo": REPO_URL,
 }

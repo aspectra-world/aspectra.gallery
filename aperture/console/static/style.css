@@ -695,6 +695,14 @@ body {
   stroke: none;
 }
 
+/* The front of Saturn's ring crosses the planet in the same white; a rim in
+   the page colour keeps the two apart, as in the brand kit's own mark. */
+.mark__svg > g > .piece[data-piece="ring-front"] {
+  stroke: var(--bg);
+  stroke-width: 4;
+  paint-order: stroke;
+}
+
 /* ----- the chromatic split --------------------------------------------
    Two whole copies of the wing, offset and blended to screen. The hexes
    are NOT palette colours and are not allowed to become any: they are the

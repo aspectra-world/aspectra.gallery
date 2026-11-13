@@ -197,7 +197,7 @@ def cmd_tags(args) -> int:
         ui.columns([(t, f"{n} photo(s)") for t, n in
                     sorted(vocabulary.items(), key=lambda kv: (-kv[1], kv[0].lower()))])
     else:
-        out("  none — write a `<photo>.tags` sidecar, or use Aperture")
+        out("  none — write a `<photo>.tags` sidecar, or use the admin")
 
     if unindexed:
         head(f"on disk, not indexed  ({len(unindexed)})")

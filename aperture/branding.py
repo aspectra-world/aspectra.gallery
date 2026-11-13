@@ -68,7 +68,7 @@ BRAND_RASTER_CAP = {"logo": 256, "pfp": 128}
 # where those copies live — beside the database, not in the photo derivative
 # trees, so a `thumbs --prune` sweep never has an opinion about them
 BRAND_CACHE_DIR = settings.data_dir / "brand"
-BRAND_DEFAULT_NAME = "Gallery"
+BRAND_DEFAULT_NAME = "aspectra.gallery"
 
 # the unbranded mark, shipped so a gallery that names no logo still has one
 BRAND_DEFAULT_LOGO = "logo/gallery-mark.svg"

@@ -142,7 +142,7 @@ def join(lucent_url: str, code: str, *, ui_url: str | None = None,
     base_url = (base_url or ui_url).rstrip("/")
     connector_secret = secrets.token_urlsafe(32)
     answer = _post(f"{lucent_url}/api/connect/pair", json_body={
-        "code": code, "kind": "aperture", "name": "Aperture",
+        "code": code, "kind": "aperture", "name": "Admin",
         "base_url": base_url, "ui_url": ui_url, "version": brand.VERSION,
         "redirect_uris": [f"{ui_url}/auth/lucent/callback"],
         "connector_secret": connector_secret, "id_token_alg": "HS256"})
@@ -167,7 +167,7 @@ def leave() -> bool:
 def _require_lucent(request: Request) -> dict:
     p = pairing()
     if p is None:
-        raise HTTPException(404, "this Aperture is not paired with Lucent")
+        raise HTTPException(404, "this gallery is not paired with Lucent")
     header = request.headers.get("authorization", "")
     sent = header[7:] if header.lower().startswith("bearer ") else ""
     digest = hashlib.sha256(sent.encode()).hexdigest()
@@ -188,7 +188,7 @@ ACTIONS = [
 @router.get("/lucent/v1/manifest")
 def manifest(request: Request):
     p = _require_lucent(request)
-    return {"contract": CONTRACT, "kind": "aperture", "name": "Aperture",
+    return {"contract": CONTRACT, "kind": "aperture", "name": "Admin",
             "version": brand.VERSION, "ui_url": p["ui_url"],
             "description": "Galerie und Bildverwaltung", "icon": _icon(),
             "offers": ["media"], "media": {"browse": True, "writes": [] if settings.console_read_only else ["tags", "albums", "links"],
@@ -198,9 +198,9 @@ def manifest(request: Request):
 
 
 def _icon() -> str | None:
-    """Aperture's mark as SVG text; Lucent shows it beside the name (contract 1, optional)."""
+    """The admin's mark as SVG text; Lucent shows it beside the name (contract 1, optional)."""
     try:
-        return (Path(__file__).parent / "static" / "logo" / "aperture.svg").read_text("utf-8")
+        return (Path(__file__).parent / "static" / "logo" / "gallery.svg").read_text("utf-8")
     except OSError:
         return None
 
@@ -320,7 +320,7 @@ async def media_tags(request: Request, image_id: int):
     its album so lookups by tag see it."""
     _require_lucent(request)
     if settings.console_read_only:
-        raise HTTPException(403, "Aperture is mounted read-only")
+        raise HTTPException(403, "The admin is mounted read-only")
     try:
         body = await request.json()
     except ValueError:
@@ -352,7 +352,7 @@ def _langs() -> list[str]:
 
 
 async def _as_person(request: Request) -> dict:
-    """A write's body, with the Lucent person noted for Aperture's audit log."""
+    """A write's body, with the Lucent person noted for the admin's audit log."""
     _require_lucent(request)
     try:
         body = await request.json()
@@ -469,7 +469,7 @@ async def media_links_delete(request: Request, slug: str = ""):
 
 @router.get("/lucent/v1/media/changes")
 def media_changes(request: Request, limit: int = 20):
-    """Aperture's own log of writes, newest first (who, what, where)."""
+    """The admin's own log of writes, newest first (who, what, where)."""
     _require_lucent(request)
     rows = security.recent(max(1, min(limit, 100)))
     return {"changes": [{"at": r.get("ts"), "action": r.get("action"), "target": r.get("target"),
@@ -659,7 +659,7 @@ def status(request: Request):
 async def action(request: Request, action: str):
     _require_lucent(request)
     if settings.console_read_only:
-        raise HTTPException(403, "Aperture is mounted read-only")
+        raise HTTPException(403, "The admin is mounted read-only")
     try:
         body = await request.json()
     except ValueError:
@@ -733,7 +733,7 @@ def _sweep_pending(now: float) -> None:
 def sign_in(request: Request):
     p = pairing()
     if p is None:
-        raise HTTPException(404, "this Aperture is not paired with Lucent")
+        raise HTTPException(404, "this gallery is not paired with Lucent")
     now = time.time()
     _sweep_pending(now)
     state, nonce, verifier, browser = (secrets.token_urlsafe(24), secrets.token_urlsafe(24),

@@ -416,11 +416,11 @@ def cmd_passwd(args) -> int:
         if args.json:
             dump({"ok": True, "cleared": existed, "password_set": False})
             return 0
-        with _screen("Aperture password"):
+        with _screen("Admin password"):
             if existed:
                 out(f"{ui.C.ye}Password cleared.{ui.C.off}")
                 out("")
-                out("Aperture now runs OPEN wherever it is allowed to run at all —")
+                out("The admin now runs OPEN wherever it is allowed to run at all —")
                 out("loopback, or APERTURE_ALLOW_OPEN=1. Anywhere else it will refuse")
                 out("to start until a password is set again.")
             else:
@@ -433,7 +433,7 @@ def cmd_passwd(args) -> int:
     else:
         import getpass
         try:
-            password = getpass.getpass("New Aperture password: ")
+            password = getpass.getpass("New admin password: ")
             confirm = getpass.getpass("Again: ")
         except (EOFError, KeyboardInterrupt):
             out("")
@@ -451,14 +451,14 @@ def cmd_passwd(args) -> int:
     if args.json:
         dump({"ok": True, "password_set": True, "file": str(path)})
         return 0
-    with _screen("Aperture password"):
+    with _screen("Admin password"):
         out(f"{ui.C.gn}Password set.{ui.C.off}")
         out("")
         kv("stored in", str(path))
         kv("hash", "scrypt (n=%d, r=%d, p=%d)"
            % (security.SCRYPT["n"], security.SCRYPT["r"], security.SCRYPT["p"]))
         out("")
-        out("Every open Aperture session was ended. Aperture now asks for this")
+        out("Every open admin session was ended. The admin now asks for this")
         out("password wherever it listens.")
     return 0
 
@@ -495,7 +495,7 @@ def cmd_lucent(args) -> int:
             out(f"  reached at  {data['base_url']}")
             out("")
             out("The sign-in page now offers \"Sign in with Lucent\"; the operator")
-            out("password keeps working. A running Aperture picks this up at once.")
+            out("password keeps working. A running admin picks this up at once.")
         return 0
 
     if args.action == "leave":
@@ -504,7 +504,7 @@ def cmd_lucent(args) -> int:
             dump({"ok": True, "left": existed})
             return 0
         with _screen("Lucent"):
-            out("Pairing removed. Remove the tool in Lucent too." if existed else "This Aperture was not paired.")
+            out("Pairing removed. Remove the tool in Lucent too." if existed else "This gallery was not paired.")
         return 0
 
     p = lucent.pairing()

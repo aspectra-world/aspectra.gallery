@@ -187,7 +187,9 @@
          built it, and which release this is. The operator's own name sits
          beside it in .foot__brand. #}
       <div class="foot__meta">
-        <a href="{{ vendor.url }}" target="_blank" rel="noopener">{{ vendor.product }}</a> &nbsp;·&nbsp; {{ vendor.version }}
+        <a href="{{ vendor.repo }}" target="_blank" rel="noopener">{{ vendor.product }}</a> &nbsp;·&nbsp; {{ vendor.version }}
+        &nbsp;·&nbsp; based on <a href="{{ vendor.upstream_url }}" target="_blank" rel="noopener">{{ vendor.upstream }}</a>
+        by <a href="{{ vendor.url }}" target="_blank" rel="noopener">{{ vendor.name }}</a>
       </div>
     </div>
   </footer>

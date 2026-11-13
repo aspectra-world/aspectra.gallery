@@ -75,4 +75,4 @@ def test_the_console_keeps_its_own_sheet_and_mark(console):
     """The fonts mount is the more specific path; everything else under
     /static must still come from the console's own folder."""
     assert console.get("/static/style.css").status_code == 200
-    assert console.get("/static/logo/lucya_logo.svg").content ==         (CONSOLE_DIR / "static" / "logo" / "lucya_logo.svg").read_bytes()
+    assert console.get("/static/logo/gallery.svg").content ==         (CONSOLE_DIR / "static" / "logo" / "gallery.svg").read_bytes()

@@ -8,6 +8,7 @@
   <title>Sign in · aspectra.gallery</title>
   <link rel="icon" type="image/svg+xml" href="{{ static_url('logo/gallery.svg') }}">
   <link rel="stylesheet" href="{{ static_url('style.css') }}">
+  <link rel="stylesheet" href="{{ static_url('aspectra.css') }}">
   {# NEBULA_FACES=1: the gallery's own font sheet, served from where it
      lives -- see app.py. gallery.cfg `faces`, NEBULA_FACES its default. #}
   {% set nebula = nebula_faces() %}
@@ -28,12 +29,7 @@
 <body class="login-body">
   {# The same backdrop the console wears, so signing in is the same room and
      not a lobby someone else built. #}
-  <div class="site-bg" aria-hidden="true">
-    <picture>
-      <source media="(max-width: 760px)" srcset="/bg/nova-square.svg?v={{ look_version() }}">
-      <img class="bg-still" src="/bg/nova-wide-16-9.svg?v={{ look_version() }}" alt="" decoding="async">
-    </picture>
-  </div>
+  <div class="site-bg site-bg--stars" aria-hidden="true"><canvas class="site-bg__stars" data-starfield></canvas></div>
 
   <main class="login">
     <form class="login__card" id="login-form" method="post" action="/api/session"
@@ -115,5 +111,6 @@
   </main>
 
   <script src="{{ static_url('login.js') }}"></script>
+  <script src="{{ static_url('starfield.js') }}" defer></script>
 </body>
 </html>

@@ -1,0 +1,42 @@
+/* aspectra.gallery: the admin in the aspectra brand kit's colours and faces, the
+   counterpart of gallery/static/f/aspectra-tokens.css + aspectra.css. Loaded after
+   style.css and before the look sheet (/theme.css), so an accent set in gallery.cfg
+   still wins. The admin is dark only, so these are the kit's dark values. */
+@font-face{ font-family:'Manrope'; src:url('/static/fonts/Manrope-400.woff2') format('woff2'); font-weight:400; font-style:normal; font-display:swap }
+@font-face{ font-family:'Manrope'; src:url('/static/fonts/Manrope-500.woff2') format('woff2'); font-weight:500; font-style:normal; font-display:swap }
+@font-face{ font-family:'Manrope'; src:url('/static/fonts/Manrope-600.woff2') format('woff2'); font-weight:600 700; font-style:normal; font-display:swap }
+
+:root{
+  --sans: "Manrope", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --head: "Space Grotesk", system-ui, sans-serif;
+  --display-font: "Space Grotesk", system-ui, sans-serif;
+
+  --bg:        #080b10;
+  --bg-2:      #0a0d13;
+  --surface:   #10141c;
+  --surface-2: #19202c;
+  --text:      #e7e9ef;
+  --text-dim:  #9aa3b2;
+  --text-ghost:#8b93a3;
+  --text-head: #d3d8e2;
+  --title-a:   #f4f6fa;
+  --title-b:   #8b93a3;
+
+  /* Blue Bell */
+  --acc:          #4e9bd6;
+  --acc-rgb:      78, 155, 214;
+  --acc-deep:     #2f6fa3;
+  --acc-soft:     #9cc8ea;
+  --acc-soft-rgb: 156, 200, 234;
+}
+
+/* headings in Space Grotesk, as on aspectra.world; running text stays Manrope */
+h1, h2, h3, .head__title, .login__title, .card__title, .group__title, .subnav__title{ font-family: var(--head) }
+
+/* the moving starfield of aspectra.world in place of the drawn backdrop; it brings
+   its own darkness, so the bloom and the dim of .site-bg::after stay off */
+.site-bg--stars::after{ display:none }
+.site-bg__stars{ position:absolute; inset:0; width:100%; height:100%; display:block }
+
+/* the wordmark as aspectra.world writes it: lower case, Space Grotesk 600 */
+.brand-name, .boot__name{ text-transform:none; letter-spacing:.01em; font-weight:600 }

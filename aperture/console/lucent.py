@@ -36,6 +36,7 @@ import hmac
 import json
 import logging
 import os
+import re
 import secrets
 import stat
 import time
@@ -201,9 +202,17 @@ def manifest(request: Request):
             "version": brand.VERSION, "ui_url": p["ui_url"],
             "description": "Galerie und Bildverwaltung", "icon": _icon(),
             "offers": ["media"], "media": {"browse": True, "writes": [] if settings.console_read_only else ["tags", "albums", "links"],
-                      "langs": _langs()},
+                      "langs": _langs(), "actions": True, "album_page": "alben",
+                      "search_hint": "is:untagged camera:fuji date:2025 tag:berlin",
+                      "bulk": [] if settings.console_read_only else _pages().BULK},
+            "pages": _pages().PAGES,
             "events": {"emits": ["media.tag_added", "media.tag_removed"]},
             "actions": [] if settings.console_read_only else ACTIONS}
+
+
+def _pages():
+    from . import lucent_pages
+    return lucent_pages
 
 
 def _icon() -> str | None:
@@ -244,6 +253,39 @@ def _item(r, ui_url: str) -> dict:
             "url": f"{ui_url}/albums/{urllib.parse.quote(r['album'])}"}
 
 
+_IS = {"featured": "i.is_showcase = 1",
+       "untagged": "NOT EXISTS (SELECT 1 FROM image_tags x WHERE x.image_id = i.id)",
+       "new": "i.indexed_at >= datetime('now', '-7 days')"}
+
+
+def _search(base: str, q: str) -> tuple[str, list]:
+    """The Library's search: the gallery's own grammar (camera:, lens:, iso:,
+    f:, mm:, date: and words, aperture/search.py) plus the console's own
+    tag:, album: and is:featured / is:untagged / is:new."""
+    from .. import search
+    parts, args, rest = [], [], []
+    for token in re.findall(r'(?:[^\s"]+:"[^"]*"|"[^"]*"|\S+)', q):
+        key, sep, val = token.partition(":")
+        val = val.strip('"')
+        key = key.lower()
+        if sep and key == "tag" and val:
+            parts.append("EXISTS (SELECT 1 FROM image_tags x JOIN tags t ON t.id = x.tag_id"
+                         " WHERE x.image_id = i.id AND t.name = ? COLLATE NOCASE)")
+            args.append(val)
+        elif sep and key == "album" and val:
+            parts.append("(i.album = ? OR substr(i.album, 1, ?) = ?)")
+            args += [val.strip("/"), len(val.strip("/")) + 1, val.strip("/") + "/"]
+        elif sep and key == "is" and val.lower() in _IS:
+            parts.append(_IS[val.lower()])
+        else:
+            rest.append(token)
+    if rest:
+        cond, params = search.condition(search.parse(" ".join(rest)), "i")
+        parts.append(f"({cond})")
+        args += params
+    return base + " WHERE " + (" AND ".join(parts) or "0"), args
+
+
 @router.get("/lucent/v1/media")
 def media(request: Request, ref: str = "", album: str = "", q: str = "", offset: int = 0, limit: int = MEDIA_LIMIT):
     """Photos for a reference (a tag, exactly), an album (with its sub-albums)
@@ -263,10 +305,7 @@ def media(request: Request, ref: str = "", album: str = "", q: str = "", offset:
         sql = base + " WHERE i.album = ? OR substr(i.album, 1, ?) = ?"
         args = [album, len(album) + 1, album + "/"]
     else:
-        like = f"%{q}%"
-        sql = base + (" LEFT JOIN image_tags it ON it.image_id = i.id LEFT JOIN tags t ON t.id = it.tag_id"
-                      " WHERE i.filename LIKE ? OR i.album LIKE ? OR t.name LIKE ?")
-        args = [like, like, like]
+        sql, args = _search(base, q)
     c = db.conn()
     total = c.execute(f"SELECT COUNT(*) FROM ({sql})", args).fetchone()[0]
     rows = c.execute(sql + " ORDER BY i.taken_at DESC, i.id DESC LIMIT ? OFFSET ?", (*args, limit, offset)).fetchall()
@@ -313,7 +352,12 @@ def _detail(image_id: int) -> dict:
         size = r["size"]
         facts.append({"label": "Datei-Größe", "value": f"{size / 1e6:.1f} MB" if size >= 1e6 else f"{max(1, round(size / 1e3))} KB"})
     facts += [{"label": label, "value": str(exif[k])} for k, label in _EXIF if exif.get(k) not in (None, "")]
-    return {**_item(r, p["ui_url"]), "rel": r["rel_path"], "tags": lib.read_tags(r["rel_path"]), "facts": facts}
+    out = {**_item(r, p["ui_url"]), "rel": r["rel_path"], "tags": lib.read_tags(r["rel_path"]), "facts": facts}
+    try:
+        out.update(_pages().media_extras(r))
+    except Exception:              # the photo page opens without its extras
+        log.exception("aperture: the photo's extras for Lucent failed")
+    return out
 
 
 @router.get("/lucent/v1/media/{image_id:int}")

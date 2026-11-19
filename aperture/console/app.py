@@ -40,7 +40,7 @@ from ..paths import (PathRefused, relative_to_photos, sidecar_target,
                      writable_target)
 from ..runtime import settings
 from .. import cfgio, links, schema, templating
-from . import imagemeta, lucent, opsapi, security
+from . import imagemeta, lucent, lucent_pages, opsapi, security
 from .library import Library, asset_kinds
 
 BASE_DIR = Path(__file__).resolve().parent
@@ -119,6 +119,8 @@ app.include_router(opsapi.router)
 # Lucent (beta): the connector API and "Sign in with Lucent". Inert until
 # `python -m aperture.cli lucent join` has paired this Aperture.
 app.include_router(lucent.router)
+# The rest of the console, described for Lucent to draw (CONNECTOR.md 5, pages).
+app.include_router(lucent_pages.router)
 
 # Authentication and CSRF for every route on this app, in one place. Declared
 # here rather than per-route so a route added later is closed by default: the

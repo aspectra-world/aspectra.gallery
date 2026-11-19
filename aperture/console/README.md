@@ -547,3 +547,16 @@ help line in `HELP`. The form builds itself from there, the gallery accepts it,
 and `doctor` stops calling it unknown — all from that one edit.
 `tests/test_schema.py` fails if a key is missing any of the three, or if a key
 list or a cfg-reading loop turns up anywhere else.
+
+## In Lucent
+
+Paired with Lucent (`python -m aperture.cli lucent join …`), all of this is
+also drawn in Lucent: the photos, tags and links natively, everything else as
+pages Aperture describes (`lucent_pages.py`) — Übersicht, Alben (an album's
+editor in tabs, the check with its fixes, files, raw file, history, one key on
+many albums), Website (gallery.cfg) and System (indexer, storage and its jobs,
+health check, privacy, backup, activity, tag hygiene, password, about), plus
+feature, cover, a pretty link and the diagnostics on a photo. Every write runs
+through the same resolver, backup and audit line as this UI, with the Lucent
+person as `by`. The contract is CONNECTOR.md in the lucent repository.
+

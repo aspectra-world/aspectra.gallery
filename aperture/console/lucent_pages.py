@@ -44,10 +44,10 @@ from . import lucent, security
 router = APIRouter()
 
 PAGES = [
-    {"id": "uebersicht", "label": "Übersicht", "icon": "info"},
-    {"id": "alben", "label": "Alben", "icon": "list"},
+    {"id": "uebersicht", "label": "Übersicht", "icon": "chart"},
+    {"id": "alben", "label": "Alben", "icon": "folder"},
     {"id": "website", "label": "Website", "icon": "globe"},
-    {"id": "system", "label": "System", "icon": "gear"},
+    {"id": "system", "label": "System", "icon": "server"},
 ]
 
 # media detail and selection actions (manifest media.actions / media.bulk)
@@ -1129,21 +1129,23 @@ def page_uebersicht(view: dict) -> dict:
         {"id": "time", "title": "Fotos über die Zeit", "kind": "columns", "items": buckets, "unit": "Fotos",
          "meta": ("je Quartal" if quarterly else "je Monat") + " · ein Klick zeigt die Fotos",
          "empty": "Noch keine Aufnahmedaten."},
-        {"id": "albums", "title": "Alben", "kind": "bars", "items": album_items, "unit": "Fotos", "limit": 10,
-         "size": "half", "empty": "Noch keine Alben.", "link": None},
-        {"id": "indexer", "title": "Indexer", "kind": "kv", "items": _indexer_kv(), "size": "half",
-         "actions": ix_actions},
-        {"id": "tags", "title": "Tags", "kind": "ring", "items": tag_ring, "ranked": False, "size": "third",
-         "center": f"{round((n - untagged) / n * 100)} %", "sub": "getaggt", "unit": "Fotos",
-         "then": [{"label": t, "value": k, "go": "media?ref=" + quote(t)} for t, k in top_tags[:6]]},
+        {"id": "albums", "title": "Alben", "kind": "bars", "items": album_items, "unit": "Fotos", "limit": 8,
+         "size": "half", "empty": "Noch keine Alben."},
+        {"id": "toptags", "title": "Häufigste Tags", "kind": "bars", "unit": "Fotos", "limit": 8, "size": "half",
+         "items": [{"label": t, "value": k, "go": "media?ref=" + quote(t)} for t, k in top_tags],
+         "empty": "Noch keine Tags."},
+        {"id": "tags", "title": "Getaggt", "kind": "ring", "items": tag_ring, "ranked": False, "size": "third",
+         "center": f"{round((n - untagged) / n * 100)} %", "sub": "getaggt", "unit": "Fotos"},
         {"id": "cameras", "title": "Kameras", "kind": "ring", "items": cams, "size": "third", "unit": "Fotos",
          "center": str(len(cams)), "sub": "Kameras", "empty": "Keine Kamera in den EXIF-Daten."},
         {"id": "formats", "title": "Formate", "kind": "ring", "items": formats, "size": "third",
          "center": _bytes(idx["bytes"]), "sub": "auf der Platte"},
-        {"id": "issues", "title": "Braucht Aufmerksamkeit", "kind": "rows", "items": issue_rows, "size": "half",
+        {"id": "indexer", "title": "Indexer", "kind": "kv", "items": _indexer_kv(), "size": "third",
+         "actions": ix_actions},
+        {"id": "issues", "title": "Braucht Aufmerksamkeit", "kind": "rows", "items": issue_rows[:8], "size": "third",
          "meta": str(len(issues)) if issues else None, "warn": bool(issues), "empty": "Nichts. Die Prüfung findet nichts."},
-        {"id": "changes", "title": "Letzte Änderungen", "kind": "rows", "items": changes, "size": "half",
-         "empty": "Noch keine.", "link": None},
+        {"id": "changes", "title": "Letzte Änderungen", "kind": "rows", "items": changes[:6], "size": "third",
+         "empty": "Noch keine."},
     ]}
 
 

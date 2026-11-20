@@ -43,6 +43,11 @@
   --nova-shard: light-dark(color-mix(in srgb, var(--acc) 26%, transparent), color-mix(in srgb, var(--acc) 50%, transparent));
   --nova-shard-2: light-dark(color-mix(in srgb, var(--acc) 12%, transparent), color-mix(in srgb, var(--acc) 30%, transparent));
   --nova-line: light-dark(color-mix(in srgb, var(--acc) 55%, transparent), color-mix(in srgb, var(--acc) 85%, transparent));
+  /* Facet 1.8: the light's source, the lit edge of a shard, the halo round
+     the main line, all from the same accent */
+  --nova-glow: light-dark(color-mix(in srgb, color-mix(in oklch, var(--acc) 45%, #ffffff) 50%, transparent), color-mix(in srgb, var(--acc) 40%, transparent));
+  --nova-edge: light-dark(rgba(255,255,255,.85), color-mix(in srgb, color-mix(in oklch, var(--acc) 35%, #ffffff) 38%, transparent));
+  --nova-halo: light-dark(color-mix(in srgb, var(--acc) 16%, transparent), color-mix(in srgb, var(--acc) 22%, transparent));
 
   /* Nebula names the kept building blocks (blocks.css) read */
   --label: var(--text-dim); --chrome: var(--text); --mist: var(--text-dim);

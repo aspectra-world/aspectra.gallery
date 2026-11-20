@@ -18,6 +18,21 @@ notes are never one commit apart.
 
 ---
 
+## 3.4.0 — 2026-11-20
+
+**The gallery on Facet 1.8: Nova with depth.** The backdrop behind the
+public pages is the same Nova in the gallery's or the album's colour, now
+drawn with depth: a soft light at its edge, a bright edge on each shard, a
+halo round the main line and a fine grain, so the long falls no longer band.
+It stays still, as before; nothing moves under the glass bar.
+
+* `static/f/facet.css` and `static/f/facet.js` are Facet 1.8 (they were
+  1.6), with the font paths pointing at `/static/fonts/` as before. This
+  brings Facet 1.7's data figures along; the gallery does not use them yet.
+* `static/f/gallery.css` derives Nova's new light, edge and halo from the
+  accent, like the rest of Nova, so an amber album has amber light.
+* The console is unchanged (still Nebula).
+
 ## 3.3.0 — 2026-11-20
 
 **A security release.** Everyone running Aperture should take it: the first

@@ -93,8 +93,56 @@
     setTimeout(close, ms);
   };
 
+  /* Nova answers (1.8). Only .f-nova--live: a resting Nova behind a console
+     never moves under glass. Pointer and scroll set a target; each frame eases
+     towards it, so the layers glide and settle instead of jerking. The loop
+     runs only while something is still moving, and only for a Nova in view.
+       --nova-dx/-dy  parallax, -1..1 (CSS turns it into translate per depth) */
+  const novas = new Map();
+  const novaStill = () => reduce.matches || root.dataset.motion === 'reduced' ||
+    root.dataset.wallpaper === 'off' || root.classList.contains('fx-lite');
+  let novaFrame = 0, ptr = null;
+  const clamp = (v, a = -1, b = 1) => Math.min(b, Math.max(a, v));
+  const novaTick = () => {
+    novaFrame = 0;
+    const still = novaStill();
+    let moving = false;
+    novas.forEach((s, el) => {
+      if (!s.seen && !s.x && !s.y) return;
+      const r = el.getBoundingClientRect();
+      const inside = !still && ptr && ptr.x >= r.left && ptr.x <= r.right && ptr.y >= r.top && ptr.y <= r.bottom;
+      /* scroll: as the stage passes through the window, the front sinks behind */
+      const sy = still ? 0 : clamp(((r.top + r.height / 2) - innerHeight / 2) / innerHeight);
+      const tx = inside ? ((ptr.x - r.left) / r.width - .5) * 2 : 0;
+      const ty = (inside ? ((ptr.y - r.top) / r.height - .5) * 1.4 : 0) + sy * .9;
+      const k = still ? 1 : .075;
+      s.x += (tx - s.x) * k; s.y += (ty - s.y) * k;
+      if (Math.abs(tx - s.x) < .0008) s.x = tx;
+      if (Math.abs(ty - s.y) < .0008) s.y = ty;
+      if (s.x !== tx || s.y !== ty) moving = true;
+      el.style.setProperty('--nova-dx', s.x.toFixed(4));
+      el.style.setProperty('--nova-dy', s.y.toFixed(4));
+    });
+    if (moving) novaFrame = requestAnimationFrame(novaTick);
+  };
+  const novaKick = () => { if (!novaFrame && novas.size) novaFrame = requestAnimationFrame(novaTick); };
+  const novaSeen = 'IntersectionObserver' in window && new IntersectionObserver(es => es.forEach(e => {
+    const s = novas.get(e.target); if (s) { s.seen = e.isIntersecting; novaKick(); }
+  }));
+  const nova = (scope = document) => scope.querySelectorAll('.f-nova--live:not(.f-nova--fixed)').forEach(el => {
+    if (novas.has(el) || !novaSeen) return;
+    novas.set(el, { x: 0, y: 0, seen: false });
+    novaSeen.observe(el);
+  });
+
   /* Replay an entrance: Facet.replay(el) restarts every animation inside */
-  const replay = el => el.getAnimations({ subtree: true }).forEach(a => { a.cancel(); a.play(); });
+  /* 1.8: also the finished ones (they are no longer in getAnimations) and
+     the pseudo-elements, so a Nova inside ignites again. */
+  const replay = el => {
+    el.classList.add('f-replay');
+    void el.offsetWidth;
+    el.classList.remove('f-replay');
+  };
 
   const init = () => {
     /* Only a stored choice touches data-theme; otherwise whatever the host
@@ -105,6 +153,12 @@
     layout();
     document.querySelectorAll('[data-count]').forEach(countUp);
     document.addEventListener('pointermove', sheen, { passive: true });
+    nova();
+    document.addEventListener('pointermove', e => { ptr = { x: e.clientX, y: e.clientY }; novaKick(); }, { passive: true });
+    document.documentElement.addEventListener('pointerleave', () => { ptr = null; novaKick(); });
+    addEventListener('scroll', novaKick, { passive: true });
+    new MutationObserver(novaKick).observe(root, { attributes: true, attributeFilter: ['data-motion', 'data-wallpaper', 'class'] });
+    reduce.addEventListener?.('change', novaKick);
     document.addEventListener('pointerdown', ripple);
     document.addEventListener('change', e => { const s = e.target.closest('.f-seg'); if (s) seg(s); });
     document.addEventListener('click', e => {
@@ -117,5 +171,5 @@
     document.fonts?.ready.then(layout);
   };
   document.readyState === 'loading' ? document.addEventListener('DOMContentLoaded', init) : init();
-  window.Facet = { toast, setTheme, replay, countUp, layout, stagger };
+  window.Facet = { toast, setTheme, replay, countUp, layout, stagger, nova };
 })();

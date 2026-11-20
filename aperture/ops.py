@@ -42,6 +42,7 @@ from datetime import datetime
 from pathlib import Path
 
 from PIL import Image
+from . import imaging
 
 from . import albums, checks, config, control, db, scanner, schema, theme
 from .runtime import settings
@@ -433,7 +434,7 @@ def gps_audit(album: str | None = None, strip: bool = False, progress=None) -> d
             progress("reading EXIF", seen, len(files))
         rel = path.relative_to(settings.photos_dir).as_posix()
         try:
-            with Image.open(path) as img:
+            with imaging.open_image(path) as img:
                 has = scanner._has_gps(img.getexif())
         except Exception as exc:
             unreadable.append(f"{rel} — {exc}")
@@ -733,7 +734,7 @@ def doctor(album: str | None = None, limit_slow: int = 50,
             continue
         checked += 1
         try:
-            with Image.open(settings.photos_dir / rel) as img:
+            with imaging.open_image(settings.photos_dir / rel) as img:
                 img.verify()
         except Exception as e:
             note("unreadable", {"rel_path": rel, "detail": f"{type(e).__name__}: {e}"})

@@ -17,6 +17,7 @@ import pytest
 from aperture import runtime
 from aperture.console.app import app as console_app
 from aperture.gallery.app import app as public_app
+from _routes import all_routes
 
 
 def _settings(**env):
@@ -131,7 +132,7 @@ def test_our_state_never_lives_in_the_photo_tree():
 
 # ----- the separation ---------------------------------------------------
 def _paths(app):
-    return {r.path for r in app.routes if hasattr(r, "path")}
+    return {r.path for r in all_routes(app) if hasattr(r, "path")}
 
 
 def test_the_two_apps_are_not_the_same_object():
@@ -151,8 +152,8 @@ def test_the_console_serves_no_gallery_page(client):
         assert path not in _paths(console_app), path
     # /albums is a path on both, and they are different pages: the console's
     # is its own Albums place, the one index.html every console address is.
-    console_albums = next(r for r in console_app.routes if getattr(r, "path", None) == "/albums")
-    public_albums = next(r for r in public_app.routes if getattr(r, "path", None) == "/albums")
+    console_albums = next(r for r in all_routes(console_app) if getattr(r, "path", None) == "/albums")
+    public_albums = next(r for r in all_routes(public_app) if getattr(r, "path", None) == "/albums")
     assert console_albums.endpoint is not public_albums.endpoint
     assert console_albums.endpoint.__module__ == "aperture.console.app"
 
@@ -162,7 +163,7 @@ def test_the_public_app_has_no_writing_route():
     half: on the public app there is nothing to lock, because there is no
     method that could write."""
     methods = set()
-    for r in public_app.routes:
+    for r in all_routes(public_app):
         methods |= set(getattr(r, "methods", ()) or ())
     assert methods <= {"GET", "HEAD", "OPTIONS"}
 

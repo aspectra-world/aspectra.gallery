@@ -17,6 +17,7 @@ from fractions import Fraction
 from pathlib import Path
 
 from PIL import ExifTags, Image
+from .. import imaging
 
 # What to surface, in the order a photographer reads it. Everything else in
 # the EXIF block is still returned under `raw`.
@@ -119,7 +120,7 @@ def read(path: Path) -> dict:
         out["mtime"] = None
 
     try:
-        with Image.open(path) as img:
+        with imaging.open_image(path) as img:
             out["width"], out["height"] = img.size
             out["format"] = img.format
             out["mode"] = img.mode

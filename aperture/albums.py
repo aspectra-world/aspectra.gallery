@@ -247,8 +247,10 @@ def _render_markdown(text: str) -> str:
     if not text:
         return ""
     try:
-        import markdown as _md
-        return _md.markdown(text, extensions=["extra", "sane_lists"], output_format="html5")
+        # raw HTML escaped, attributes and URL schemes allowlisted -- the
+        # result is printed `| safe` and served by /api with CORS *
+        from . import mdsafe
+        return mdsafe.render(text)
     except Exception:
         import html as _html
         blocks = [b.strip() for b in text.replace("\r\n", "\n").split("\n\n") if b.strip()]

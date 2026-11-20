@@ -164,7 +164,9 @@ async def security_headers(request: Request, call_next):
         vary = response.headers.get("vary")
         response.headers["Vary"] = f"{vary}, {extra}" if vary else extra
         response.headers.setdefault("Cache-Control", "no-store")
-    https = request.url.scheme == "https" or request.headers.get("x-forwarded-proto") == "https"
+    # uvicorn has already applied X-Forwarded-Proto from FORWARDED_ALLOW_IPS
+    # (and from nobody else) to the scheme; the raw header is anyone's.
+    https = request.scope.get("scheme") == "https"
     response.headers.setdefault("Content-Security-Policy", CSP_HTTPS if https else CSP)
     # Which software served this — the header half of the attribution the
     # footer carries in words (aperture/brand.py). Not a security header; it sits

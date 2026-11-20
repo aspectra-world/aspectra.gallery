@@ -158,6 +158,10 @@ os.environ.update(
     STRIP_GPS="1",
     APERTURE_ROLE="all",
     APERTURE_BIND="127.0.0.1",
+    # TestClient calls itself `testserver`: a hostname, which a console
+    # without a password only answers to when it is listed (DNS rebinding,
+    # console/security.py). tests/test_security_fixes.py tries the others.
+    APERTURE_HOSTS="testserver",
     # the update notice never reaches the network from a test
     UPDATE_CHECK="0",
 )

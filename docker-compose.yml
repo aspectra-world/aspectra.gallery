@@ -72,6 +72,10 @@ services:
       #   docker compose run --rm aperture python -m aperture.cli passwd
       - APERTURE_BIND=0.0.0.0
       - APERTURE_ALLOW_OPEN=${APERTURE_ALLOW_OPEN:-${CONSOLE_ALLOW_OPEN:-0}}
+      # Without a password: the host names (besides loopback and IP
+      # addresses) Aperture answers to -- anything else is refused as a
+      # possible DNS rebinding. See .env.example.
+      - APERTURE_HOSTS=${APERTURE_HOSTS:-}
       - READ_ONLY=${READ_ONLY:-0}
       # Aperture asks lucya.sh at most twice a day whether a newer release
       # exists and says so. Nothing is downloaded. 0 = never ask.

@@ -4,10 +4,10 @@
 {% block body_class %}page-albums{% endblock %}
 {% block content %}
 <div class="g-page">
-  <header class="g-head">
+  <header class="g-head" data-stagger>
     {{ crumbs() }}
     <h1 class="g-title">{{ t('index.slug') }}</h1>
-    {% if albums %}<p class="g-meta"><span><b>{{ albums | length }}</b> {{ t('stat.albums') }}</span><span><b>{{ albums | sum(attribute='count') }}</b> {{ t('stat.images') }}</span></p>{% endif %}
+    {% if albums %}<p class="g-meta"><span><b data-count="{{ albums | length }}">{{ albums | length }}</b> {{ t('stat.albums') }}</span><span><b data-count="{{ albums | sum(attribute='count') }}">{{ albums | sum(attribute='count') }}</b> {{ t('stat.images') }}</span></p>{% endif %}
   </header>
 
   {% if not albums %}
@@ -15,7 +15,7 @@
   {% else %}
     {% if showcase_albums %}
     <section class="g-section" aria-labelledby="feat-head">
-      <div class="g-section__head"><h2 class="g-section__title" id="feat-head"><i class="fa fa-star" aria-hidden="true"></i> {{ t('feat.label') }}</h2><span class="g-section__n">{{ showcase_albums | length }}</span></div>
+      <div class="g-section__head" data-reveal><h2 class="g-section__title" id="feat-head"><i class="fa fa-star" aria-hidden="true"></i> {{ t('feat.label') }}</h2><span class="g-section__n">{{ showcase_albums | length }}</span></div>
       {{ posters(showcase_albums, eager=3) }}
     </section>
     {% endif %}

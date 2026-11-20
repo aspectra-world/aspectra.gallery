@@ -45,6 +45,7 @@
   <meta name="twitter:title" content="{{ brand.og_title }}">
   <meta name="twitter:description" content="{{ brand.desc }}">
   {% endblock %}
+  <script src="{{ static_url('f/vt.js') }}"></script>
   {% block head_extra %}{% endblock %}
 </head>
 <body class="{% block body_class %}{% endblock %}">
@@ -54,7 +55,7 @@
      picture under a veil instead (one <picture>, so only one file loads). #}
   {% set _bga = bg_album | default(none) %}
   {% if wears_nova(_bga) %}
-  <div class="g-bg f-nova f-nova--fixed f-nova--veil" aria-hidden="true"></div>
+  <div class="g-bg f-nova f-nova--fixed f-nova--veil f-nova--live" aria-hidden="true"></div>
   {% else %}
   {% set bg = site_bg(_bga) %}
   <div class="g-bg" aria-hidden="true">

@@ -8,6 +8,46 @@
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches ||
     document.documentElement.dataset.motion === 'reduced';
 
+  /* ---- Facet's motion on the gallery's parts (FACET.md rule 6) ----
+     Order for the tiles' rise and the columns of /stats: --i, set through
+     the CSSOM (the CSP allows no style attribute in the markup). */
+  $$('.g-cards, .g-photos, .g-posters').forEach((ul) =>
+    [...ul.children].slice(0, 12).forEach((li, i) => li.style.setProperty('--i', i)));
+  $$('.ch-cols').forEach((row) => $$('.ch-col', row).forEach((c, i) => c.style.setProperty('--i', i)));
+
+  // the ripple from the press point, Facet's .f-ripple on the gallery's buttons
+  document.addEventListener('pointerdown', (e) => {
+    const b = e.target.closest?.('.g-btn, .g-reel__nav, .g-chip, .g-icon, .g-link');
+    if (!b || reduce || e.button > 0) return;
+    const r = b.getBoundingClientRect(), d = Math.hypot(r.width, r.height) * 2;
+    const s = document.createElement('span');
+    s.className = 'f-ripple';
+    Object.assign(s.style, { width: `${d}px`, height: `${d}px`, left: `${e.clientX - r.left}px`, top: `${e.clientY - r.top}px` });
+    b.append(s);
+    s.addEventListener('animationend', () => s.remove(), { once: true });
+  });
+
+  // the bar's glint follows the pointer
+  const bar = $('.g-bar');
+  if (bar && !reduce && matchMedia('(hover: hover) and (pointer: fine)').matches) {
+    bar.addEventListener('pointermove', (e) => {
+      const r = bar.getBoundingClientRect();
+      bar.style.setProperty('--mx', `${e.clientX - r.left}px`);
+      bar.style.setProperty('--my', `${e.clientY - r.top}px`);
+    }, { passive: true });
+  }
+
+  // the mode switch: a circle opens from the toggle (Facet's view transition).
+  // The toggle is a link (the server keeps the choice), so the circle is a
+  // cross-document transition: this side notes where it starts, f/vt.js on
+  // the next page draws it.
+  document.addEventListener('click', (e) => {
+    const a = e.target.closest?.('a[href^="/theme/"]');
+    if (!a || reduce || e.button > 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    const r = a.getBoundingClientRect();
+    try { sessionStorage.setItem('g-theme-from', JSON.stringify({ x: r.left + r.width / 2, y: r.top + r.height / 2, t: Date.now() })); } catch {}
+  });
+
   /* ---- reels: the welcome hero and an album's featured strip ---- */
   const hydrate = (slide) => {
     const img = slide && $('img[data-src]', slide);
@@ -25,7 +65,10 @@
       slides.forEach((s, k) => { s.classList.toggle('is-on', k === i); s.setAttribute('aria-hidden', k === i ? 'false' : 'true'); });
       dots.forEach((d, k) => d.classList.toggle('is-on', k === i));
       const href = slides[i].getAttribute('href');
-      if (name) name.textContent = slides[i].dataset.name || '';
+      if (name && name.textContent !== (slides[i].dataset.name || '')) {
+        name.textContent = slides[i].dataset.name || '';
+        name.classList.remove('is-new'); void name.offsetWidth; name.classList.add('is-new');
+      }
       if (file) file.setAttribute('href', href);
       if (open) open.setAttribute('href', href);
       cur = i;
@@ -144,14 +187,32 @@
       const pre = new Image(); pre.src = img.getAttribute('src');
       await Promise.race([pre.decode().catch(() => {}), new Promise((r) => setTimeout(r, 2500))]);
       if (mine !== ticket) return;
-      page.replaceWith(document.adoptNode(next));
-      $('#album-data').textContent = nextData.textContent;
+      // the photo crossfades into the next one (a view transition named on
+      // the stage only); the rest of the page simply changes
+      const swap = () => {
+        next.classList.add('is-swap');
+        page.replaceWith(document.adoptNode(next));
+        $('#album-data').textContent = nextData.textContent;
+      };
+      if (document.startViewTransition && !reduce) {
+        const html = document.documentElement;
+        html.classList.add('g-step');
+        const vt = document.startViewTransition(swap);
+        vt.ready.catch(() => {});   // skipped (a quick second step): nothing to draw
+        await vt.updateCallbackDone;
+        vt.finished.finally(() => html.classList.remove('g-step'));
+      } else swap();
       document.title = doc.title;
       ['og:title', 'og:description', 'og:url', 'og:image'].forEach((k) => {
         const from = $(`meta[property="${k}"]`, doc), to = $(`meta[property="${k}"]`);
         if (from && to) to.setAttribute('content', from.getAttribute('content'));
       });
       if (push) history.pushState({ photo: true }, '', href);
+      // the bar's mode and language links come back to the photo now showing
+      const here = location.pathname + location.search;
+      $$('.g-bar a[href^="/theme/"], .g-bar a[href^="/lang/"]').forEach((a) => {
+        const u = new URL(a.href); u.searchParams.set('next', here); a.setAttribute('href', u.pathname + u.search);
+      });
       bind();
     } catch {
       if (mine === ticket) location.assign(href);

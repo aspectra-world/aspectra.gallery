@@ -14,19 +14,19 @@
   <meta name="twitter:title" content="{{ t('stats.slug') }} — {{ brand.og_title }}"><meta name="twitter:description" content="{{ og_desc }}">
 {% endblock %}
 {% macro panel(title, note='', wide=False) %}
-  <section class="g-panel{% if wide %} g-panel--wide{% endif %}">
+  <section class="g-panel{% if wide %} g-panel--wide{% endif %}" data-reveal>
     <div><h2>{{ title }}</h2>{% if note %}<p class="g-note">{{ note }}</p>{% endif %}</div>
     <div>{{ caller() }}</div>
   </section>
 {% endmacro %}
 {% block content %}
 <div class="g-page">
-  <header class="g-head">
+  <header class="g-head" data-stagger>
     {{ crumbs(albums=False, tail=t('stats.slug')) }}
     <h1 class="g-title">{{ t('stats.slug') }}</h1>
     <p class="g-meta">
-      <span><b>{{ figs.photos }}</b> {{ t('unit.image') if figs.photos == 1 else t('unit.images') }}</span>
-      <span><b>{{ figs.folders }}</b> {{ t('unit.directory') if figs.folders == 1 else t('unit.directories') }}</span>
+      <span><b data-count="{{ figs.photos }}">{{ figs.photos }}</b> {{ t('unit.image') if figs.photos == 1 else t('unit.images') }}</span>
+      <span><b data-count="{{ figs.folders }}">{{ figs.folders }}</b> {{ t('unit.directory') if figs.folders == 1 else t('unit.directories') }}</span>
       {% if span_label %}<span>{{ span_label }}</span>{% endif %}
       {% if busiest_label %}<span>{{ t('stats.fig.busiest') }} · <b>{{ busiest_label }}</b></span>{% endif %}
     </p>
@@ -35,13 +35,13 @@
   <div class="g-empty"><p>{{ t('stats.empty') }}</p></div>
   {% else %}
   <p class="g-about__body">{{ t('stats.lead') }}</p>
-  <dl class="g-facts">
+  <dl class="g-facts" data-stagger>
     <div class="g-fact"><dt><i class="fa fa-image" aria-hidden="true"></i>{{ t('stats.fig.photos') }}</dt><dd data-count="{{ figs.photos }}">{{ figs.photos }}</dd></div>
-    <div class="g-fact"><dt><i class="fa fa-folder-open" aria-hidden="true"></i>{{ t('stats.fig.albums') }}</dt><dd>{{ figs.albums }}</dd></div>
-    <div class="g-fact"><dt><i class="fa fa-folder-tree" aria-hidden="true"></i>{{ t('stats.fig.folders') }}</dt><dd>{{ figs.folders }}</dd></div>
-    <div class="g-fact"><dt><i class="fa fa-star" aria-hidden="true"></i>{{ t('stats.fig.featured') }}</dt><dd>{{ figs.featured }}</dd></div>
-    <div class="g-fact"><dt><i class="fa fa-calendar-day" aria-hidden="true"></i>{{ t('stats.fig.days') }}</dt><dd>{{ figs.days }}</dd></div>
-    <div class="g-fact"><dt><i class="fa fa-tags" aria-hidden="true"></i>{{ t('stats.fig.tags') }}</dt><dd>{{ figs.tags }}</dd></div>
+    <div class="g-fact"><dt><i class="fa fa-folder-open" aria-hidden="true"></i>{{ t('stats.fig.albums') }}</dt><dd data-count="{{ figs.albums }}">{{ figs.albums }}</dd></div>
+    <div class="g-fact"><dt><i class="fa fa-folder-tree" aria-hidden="true"></i>{{ t('stats.fig.folders') }}</dt><dd data-count="{{ figs.folders }}">{{ figs.folders }}</dd></div>
+    <div class="g-fact"><dt><i class="fa fa-star" aria-hidden="true"></i>{{ t('stats.fig.featured') }}</dt><dd data-count="{{ figs.featured }}">{{ figs.featured }}</dd></div>
+    <div class="g-fact"><dt><i class="fa fa-calendar-day" aria-hidden="true"></i>{{ t('stats.fig.days') }}</dt><dd data-count="{{ figs.days }}">{{ figs.days }}</dd></div>
+    <div class="g-fact"><dt><i class="fa fa-tags" aria-hidden="true"></i>{{ t('stats.fig.tags') }}</dt><dd data-count="{{ figs.tags }}">{{ figs.tags }}</dd></div>
     <div class="g-fact"><dt><i class="fa fa-database" aria-hidden="true"></i>{{ t('stats.fig.data') }}</dt><dd class="is-date">{{ figs.data }}</dd></div>
     <div class="g-fact"><dt><i class="fa fa-table-cells" aria-hidden="true"></i>{{ t('stats.fig.pixels') }}</dt><dd class="is-date">{{ figs.pixels }}</dd></div>
   </dl>

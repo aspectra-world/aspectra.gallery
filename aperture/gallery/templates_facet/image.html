@@ -23,7 +23,7 @@
 {% set _qs = [_sort_qs, _col_qs] | select | join('&') %}
 {% set img_qs = ('?' ~ _qs) if _qs else '' %}
 <div class="g-page">
-  <header class="g-head">
+  <header class="g-head" data-stagger>
     {{ crumbs(breadcrumbs, tail=image.filename) }}
     <div class="g-head__row">
       <h1 class="g-title">{{ image.filename }}</h1>
@@ -44,14 +44,14 @@
         {% if next_rel %}<a class="g-stage__arrow g-stage__arrow--next" href="/image/{{ next_rel }}{{ img_qs }}" data-next aria-label="{{ t('aria.next') }}"><i class="fa fa-chevron-right" aria-hidden="true"></i></a>{% endif %}
         <span class="g-stage__q" id="quality-stamp" data-q-preview="{{ t('quality.preview') }}" data-q-original="{{ t('quality.original') if t('quality.original') != 'quality.original' else 'Original' }}">{{ t('quality.preview') }}</span>
       </div>
-      <div class="g-actions">
+      <div class="g-actions" data-stagger>
         <button type="button" class="g-btn g-btn--sm" id="load-full-btn"><i class="fa fa-image" aria-hidden="true"></i>{{ t('btn.load_original') }}</button>
         <button type="button" class="g-btn g-btn--sm" id="open-fullscreen-btn"><i class="fa fa-expand" aria-hidden="true"></i>{{ t('btn.fullscreen') }}</button>
         <a href="{{ media_url('full', image) }}" download="{{ image.filename }}" class="g-btn g-btn--sm"><i class="fa fa-download" aria-hidden="true"></i>{{ t('btn.download') }}</a>
       </div>
     </div>
 
-    <aside class="g-side">
+    <aside class="g-side" data-stagger>
       <section class="g-panel">
         <h2><i class="fa fa-circle-info" aria-hidden="true"></i>{{ t('panel.file') }}</h2>
         <dl class="g-kv">

@@ -1519,6 +1519,12 @@ What replaces it:
   (the port is only published on `127.0.0.1`, or a firewall covers it) say so
   with `APERTURE_ALLOW_OPEN=1`. On loopback, no password runs open with a
   warning on every start — and a red bar across Aperture saying so.
+- **Host names, when it runs open.** Without a password Aperture answers
+  loopback, addresses typed as an IP, the names in `APERTURE_HOSTS`
+  (comma-separated, no port) and the address it was paired with Lucent at —
+  anything else is refused, because a web page can point its own name at
+  `127.0.0.1` (DNS rebinding). A Host header that is not a name or an IP is
+  refused with a password too.
 - **Sessions.** Server-side, `HttpOnly` + `SameSite=Strict` cookie, `Secure`
   where the browser would accept it, 30 minutes idle and 12 hours absolute.
   Changing the password ends every open session.
@@ -1526,7 +1532,9 @@ What replaces it:
   mutating request, and a session-bound token in `X-Aperture-CSRF`. The
   cross-site check applies even when Aperture runs open.
 - **Throttling.** Three free attempts per address, then exponential backoff
-  capped at five minutes; the answer becomes `429` with a `Retry-After`.
+  capped at five minutes; the answer becomes `429` with a `Retry-After`. On
+  top, a ceiling for everyone: past 50 failures in ten minutes every attempt
+  waits 60 seconds after the last one. A new password needs 12 characters.
 - **Uploads.** Extension allowlist *and* a magic-byte check, so an HTML page
   named `icon.png` is refused; 8 MB cap; a 64 MP ceiling on anything Pillow
   decodes.

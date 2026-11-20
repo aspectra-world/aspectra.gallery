@@ -18,6 +18,49 @@ notes are never one commit apart.
 
 ---
 
+## 3.3.0 — 2026-11-20
+
+**A security release.** Everyone running Aperture should take it: the first
+item below let anything that reaches the console's port in without a
+password.
+
+**Before you upgrade:** if your console runs WITHOUT a password and you open
+it by a host name (`nas.local:8090`, `aperture.lan:8090`), list that name in
+`APERTURE_HOSTS` (comma-separated, no port) or set a password. Loopback and
+addresses typed as an IP keep working as they are; with a password nothing
+changes. New passwords need 12 characters; an existing one keeps working.
+
+* **Console: no way past the door through the Host header.** The guard asked
+  `request.url.path` whether a route was open, and Starlette built that from
+  the Host header, so `Host: x/login?` opened every route, read and write,
+  without a session or a CSRF token (CVE-2026-48710). The guard now checks
+  the path the router dispatches on, a Host header that is not a name or an
+  IP is a 400, and Starlette is at 1.10.0.
+* **Console without a password: no DNS rebinding.** It answered any host
+  name, so a web page could point its own name at 127.0.0.1 and drive the
+  console from the operator's browser. It now answers loopback, IP
+  addresses, `APERTURE_HOSTS` and the address it was paired with Lucent at;
+  the Lucent connector routes keep checking their own token.
+* **Album descriptions carry no markup.** Raw HTML in an `album_*.md` came
+  through to the album page and to `/api` (served with CORS `*`). It is now
+  shown as text; attributes and link schemes are allowlisted, so no
+  `javascript:` or `data:` links and no `{: onclick=… }`.
+* **Photos only reach photo decoders.** A `.jpg` that was really another
+  format went into that format's decoder. Decoding is limited to JPEG, MPO,
+  PNG, WebP, GIF, TIFF, BMP, HEIF and AVIF (`aperture/imaging.py`).
+* **Sign-in:** a global ceiling on failed attempts on top of the
+  per-address one (50 in 10 minutes, then 60 s), a bounded failure table,
+  12 characters for a new password. `X-Forwarded-Proto` is believed only
+  from `FORWARDED_ALLOW_IPS`. A non-ASCII CSRF header is a 403, not a 500.
+* **Dependencies:** FastAPI 0.165.0, Starlette 1.10.0, python-multipart
+  0.0.34, Pillow 13.0.0, pillow-heif 1.8.1, Jinja2 3.1.6, Markdown 3.11.3,
+  uvicorn 0.54.0, which together close the advisories against the versions
+  this replaces.
+* **Build:** the image workflow's actions are pinned to commits.
+* **Tests:** `tests/test_security_fixes.py` reproduces each of these. The
+  route tests flatten included routers (`tests/_routes.py`), which FastAPI
+  now nests, so they check the routes they are meant to check again.
+
 ## 3.2.0 — 2026-11-11
 
 **A new gallery, built on Facet from the ground up.** The public pages are

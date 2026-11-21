@@ -187,21 +187,15 @@
       const pre = new Image(); pre.src = img.getAttribute('src');
       await Promise.race([pre.decode().catch(() => {}), new Promise((r) => setTimeout(r, 2500))]);
       if (mine !== ticket) return;
-      // the photo crossfades into the next one (a view transition named on
-      // the stage only); the rest of the page simply changes
-      const swap = () => {
-        next.classList.add('is-swap');
-        page.replaceWith(document.adoptNode(next));
-        $('#album-data').textContent = nextData.textContent;
-      };
-      if (document.startViewTransition && !reduce) {
-        const html = document.documentElement;
-        html.classList.add('g-step');
-        const vt = document.startViewTransition(swap);
-        vt.ready.catch(() => {});   // skipped (a quick second step): nothing to draw
-        await vt.updateCallbackDone;
-        vt.finished.finally(() => html.classList.remove('g-step'));
-      } else swap();
+      // A plain swap, no view transition: a transition freezes the page for
+      // its snapshot and catches the new <img> before it is painted, which
+      // showed a black stage for a moment. The photo is decoded already; it
+      // is drawn with the frame it arrives in (decoding sync) and only
+      // settles a little (transform, never opacity: nothing fades to black).
+      img.decoding = 'sync';
+      next.classList.add('is-swap');
+      page.replaceWith(document.adoptNode(next));
+      $('#album-data').textContent = nextData.textContent;
       document.title = doc.title;
       ['og:title', 'og:description', 'og:url', 'og:image'].forEach((k) => {
         const from = $(`meta[property="${k}"]`, doc), to = $(`meta[property="${k}"]`);

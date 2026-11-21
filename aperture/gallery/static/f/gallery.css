@@ -483,9 +483,8 @@ details > summary{ cursor:pointer; color:var(--text-dim); font:500 var(--fs-200)
   .g-page > :nth-child(2){ animation-delay:calc(var(--stagger) * 1) } .g-page > :nth-child(3){ animation-delay:calc(var(--stagger) * 2) }
   .g-page > :nth-child(4){ animation-delay:calc(var(--stagger) * 3) } .g-page > :nth-child(5){ animation-delay:calc(var(--stagger) * 4) }
   .g-page > :nth-child(n+6){ animation-delay:calc(var(--stagger) * 5) }
-  /* a photo stepped in place: the stage crossfades (view transition), the
-     page does not rise a second time underneath it */
-  .g-page.is-swap > *, .g-page.is-swap .g-stage img, .g-page.is-swap [data-stagger] > *{ animation:none }
+  /* a photo stepped in place: the page does not rise a second time */
+  .g-page.is-swap > *, .g-page.is-swap [data-stagger] > *{ animation:none }
 }
 /* tiles rise only where there is a mouse, and only on the first screen; on
    a phone the page arrives once and then stays still. In sequence: gallery.js
@@ -552,9 +551,11 @@ body:not(.page-welcome) .g-bg.f-nova--live::before{ animation:f-drift 18s var(--
 .g-stage__arrow .fa{ transition:transform var(--dur-2) var(--spring) }
 .g-stage__arrow--prev:hover .fa{ transform:translateX(-2px) }
 .g-stage__arrow--next:hover .fa{ transform:translateX(2px) }
-::view-transition-group(g-shot){ animation-duration:var(--dur-3); animation-timing-function:var(--ease-out) }
-::view-transition-old(g-shot),::view-transition-new(g-shot){ animation-duration:var(--dur-3) }
-html.g-step .g-stage img{ view-transition-name:g-shot }
+/* a photo stepped in place: drawn at once, it only settles (no opacity) */
+@keyframes g-settle{ from{ transform:scale(.985) } }
+@media (prefers-reduced-motion: no-preference){
+  .g-page.is-swap .g-stage img{ animation:g-settle var(--dur-3) var(--spring-soft) }
+}
 
 /* the lightbox: the picture lifts in, the bar follows */
 .g-lb[open] .g-lb__stage img{ animation:f-pop var(--dur-3) var(--ease-out) backwards }

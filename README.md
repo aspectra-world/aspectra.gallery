@@ -38,7 +38,7 @@ decided by `APERTURE_ROLE` — `all` for one container with both, or `public` an
 - **Mobile-friendly:** responsive grid, large touch targets, keyboard navigation (← → ESC) on desktop.
 - **Read-only where it faces the public:** the gallery app has no route that is not a `GET` — no write endpoints, no uploads, no tag editing. The one write path in the product belongs to Aperture, on the other port, and reaches only the `.album/` and `.gallery/` metadata folders. See [Security / hosting](#security--hosting).
 - **Aperture:** the config editor *and the operations panel*, built in. Album and gallery `cfg` files, per-language descriptions, icons, title fonts, wallpapers and brand assets, with validation — plus the indexer's live state, scan / pause / resume, and `doctor`, on its own port, never on the public one. Its **Changelog** place shows the release notes the build ships with, the repository on GitHub, and who makes the software.
-- **Lucent (beta, branch `beta/lucent`):** pair Aperture with Lucent, the lucya.systems platform, with `python -m aperture.cli lucent join <url> <code>`. Lucent then shows the gallery's state, can start a scan or pause the indexer, and offers "Sign in with Lucent" beside the operator password. Unpaired, nothing changes. See "Rerelease: Lucent" under 3.0.0 in [CHANGELOG.md](CHANGELOG.md) and CONNECTOR.md in the lucent repository.
+- **Lucent:** pair Aperture with Lucent, the lucya.systems platform, with `python -m aperture.cli lucent join <url> <code>`. Lucent then shows the gallery's state, can start a scan or pause the indexer, and offers "Sign in with Lucent" beside the operator password. Unpaired, nothing changes. See "Rerelease: Lucent" under 3.0.0 in [CHANGELOG.md](CHANGELOG.md) and CONNECTOR.md in the lucent repository.
 - **Operations CLI:** `python -m aperture.cli` — run or pause the indexer, check index/config/derivative drift with `doctor`, audit tags and GPS, and inspect exactly how a photo, an album, the welcome hero or a trip resolves. See [Operations CLI](#operations-cli).
 - **Self-watch & failsafe:** every serving process keeps an eye on the storage it stands on and on what an operator should hear about first (disk space, a share without a rescan, the indexer). If the photo share goes away — a NAS that sleeps at night — the gallery answers 503 with a page that says so instead of a 500, keeps the index untouched, and comes back by itself. `/healthz` for monitors. See [Self-watch and failsafe](#self-watch-and-failsafe).
 - **Security headers:** CSP, X-Frame-Options, X-Content-Type-Options, Referrer-Policy, Permissions-Policy — all set by built-in middleware.
@@ -1524,6 +1524,12 @@ What replaces it:
   (the port is only published on `127.0.0.1`, or a firewall covers it) say so
   with `APERTURE_ALLOW_OPEN=1`. On loopback, no password runs open with a
   warning on every start — and a red bar across Aperture saying so.
+- **Host names, when it runs open.** Without a password Aperture answers
+  loopback, addresses typed as an IP, the names in `APERTURE_HOSTS`
+  (comma-separated, no port) and the address it was paired with Lucent at —
+  anything else is refused, because a web page can point its own name at
+  `127.0.0.1` (DNS rebinding). A Host header that is not a name or an IP is
+  refused with a password too.
 - **Sessions.** Server-side, `HttpOnly` + `SameSite=Strict` cookie, `Secure`
   where the browser would accept it, 30 minutes idle and 12 hours absolute.
   Changing the password ends every open session.
@@ -1531,7 +1537,9 @@ What replaces it:
   mutating request, and a session-bound token in `X-Aperture-CSRF`. The
   cross-site check applies even when Aperture runs open.
 - **Throttling.** Three free attempts per address, then exponential backoff
-  capped at five minutes; the answer becomes `429` with a `Retry-After`.
+  capped at five minutes; the answer becomes `429` with a `Retry-After`. On
+  top, a ceiling for everyone: past 50 failures in ten minutes every attempt
+  waits 60 seconds after the last one. A new password needs 12 characters.
 - **Uploads.** Extension allowlist *and* a magic-byte check, so an HTML page
   named `icon.png` is refused; 8 MB cap; a 64 MP ceiling on anything Pillow
   decodes.

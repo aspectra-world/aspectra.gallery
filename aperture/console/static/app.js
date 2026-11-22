@@ -1253,7 +1253,7 @@ function paintOpsAccess(grid, st, ro) {
     ro ? quiet('The admin is mounted read-only.') : null,
     el('div', { class: 'ops__form' },
       isSet ? opsInput('pw-current', { type: 'password', placeholder: 'current password', autocomplete: 'current-password', disabled: ro }) : null,
-      opsInput('pw-new', { type: 'password', placeholder: 'new password — 8 characters or more', autocomplete: 'new-password', disabled: ro }),
+      opsInput('pw-new', { type: 'password', placeholder: 'new password — 12 characters or more', autocomplete: 'new-password', disabled: ro }),
       opsInput('pw-again', { type: 'password', placeholder: 'again', autocomplete: 'new-password', disabled: ro,
                              onkeydown: onEnter(setPassword) })),
     el('div', { class: 'card__actions' },

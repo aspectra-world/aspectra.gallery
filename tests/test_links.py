@@ -17,6 +17,7 @@ from aperture import checks, links, ops, runtime
 from aperture.console import security
 from aperture.console.app import app as console_app
 from aperture.gallery.app import app as public_app
+from _routes import all_routes
 
 PASSWORD = "links-test-password"
 
@@ -80,7 +81,7 @@ def test_a_link_may_share_a_name_with_a_page_of_the_gallery(client):
 def test_the_s_prefix_belongs_to_links_alone():
     """A later route under /s/ would be the collision the prefix exists to
     rule out — in either direction."""
-    under = [r.path for r in public_app.routes
+    under = [r.path for r in all_routes(public_app)
              if r.path == links.PREFIX.rstrip("/") or r.path.startswith(links.PREFIX)]
     assert under == [links.PREFIX + "{slug}"], under
 

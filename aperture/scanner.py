@@ -11,6 +11,7 @@ from fractions import Fraction
 from pathlib import Path
 
 from PIL import Image, ExifTags, ImageOps
+from . import imaging
 
 from . import brand, capture, colors, db, health, marks, vision
 from . import schema
@@ -248,7 +249,7 @@ def _has_gps(exif) -> bool:
 def strip_gps_inplace(path: Path) -> bool:
     """Remove GPS EXIF from the original file in place. Returns True if modified."""
     try:
-        with Image.open(path) as img:
+        with imaging.open_image(path) as img:
             exif = img.getexif()
             if not _has_gps(exif):
                 return False
@@ -379,7 +380,7 @@ def _make_thumbnail(src: Path, dst: Path, size: int) -> bool:
     tmp = None
     try:
         dst.parent.mkdir(parents=True, exist_ok=True)
-        with Image.open(src) as img:
+        with imaging.open_image(src) as img:
             # Shrunk first, turned upright after: the
             # box is square, so the order changes nothing in the result, and
             # exif_transpose on the full frame made a second full-size copy
@@ -423,7 +424,7 @@ def max_edge(p: Path) -> int | None:
     Opening does not decode the pixels — PIL reads the header — so this is
     cheap enough to ask on a request path."""
     try:
-        with Image.open(p) as img:
+        with imaging.open_image(p) as img:
             return max(img.size)
     except Exception:
         return None
@@ -439,7 +440,7 @@ def make_brand_thumb(src: Path, dst: Path, size: int) -> bool:
     here and is served untouched."""
     try:
         dst.parent.mkdir(parents=True, exist_ok=True)
-        with Image.open(src) as img:
+        with imaging.open_image(src) as img:
             img = ImageOps.exif_transpose(img)
             img.thumbnail((size, size), Image.LANCZOS)
             if img.mode not in ("RGB", "RGBA"):
@@ -454,7 +455,7 @@ def make_brand_thumb(src: Path, dst: Path, size: int) -> bool:
 def make_full_jpeg(src: Path, dst: Path) -> bool:
     try:
         dst.parent.mkdir(parents=True, exist_ok=True)
-        with Image.open(src) as img:
+        with imaging.open_image(src) as img:
             # The HEIC path, which is exactly where rotated phone photos arrive.
             img = ImageOps.exif_transpose(img)
             if img.mode in ("RGBA", "P", "LA"):
@@ -713,7 +714,7 @@ def index_image(photos_dir: Path, file: Path, force: bool = False) -> bool:
     exif: dict = {}
     taken = None
     try:
-        with Image.open(file) as img:
+        with imaging.open_image(file) as img:
             width, height = img.size
             try:
                 exif, taken = extract_exif(img)
@@ -788,7 +789,7 @@ def read_vision(rel: str, thumb: Path) -> bool:
     if row is None:
         return False
     try:
-        with Image.open(thumb) as img:
+        with imaging.open_image(thumb) as img:
             vec = model.embed_images([img])[0]
     except Exception as e:
         log.warning("vision failed for %s: %s: %s", rel, type(e).__name__, e)

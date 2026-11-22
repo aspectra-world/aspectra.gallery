@@ -38,6 +38,10 @@ carries the fork's name.
 - Header logo: the Saturn of aspectra.world (`logo/saturn.png`) unless gallery.cfg names a
   logo; the tab icon stays the gallery icon of the brand kit.
 
+## Upstream updates
+
+- 2026-11-22: merged upstream 3.3.0 (security release: auth bypass via the Host header, DNS rebinding, HTML in descriptions, dependencies) and 3.4.0 (Facet 1.8). Kept here: the aspectra starfield instead of Nova, "admin" in the password message. Not taken: `.github/workflows/image.yml`, which pushes an image to ghcr.io on every push; this fork's `ci.yml` only tests and builds, with its actions pinned to commits like upstream's.
+
 ## Planned
 
 - In the admin: scan interval and folder watcher, GPS hiding/stripping, image sizes.

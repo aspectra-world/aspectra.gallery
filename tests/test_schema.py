@@ -315,3 +315,10 @@ def test_a_jpeg_icon_can_be_uploaded_and_is_served_as_one():
                                    allowed_exts=console_mod._SCOPE_EXTS["album"])
     assert target.name == "mark.jpg"
     assert theme.ALBUM_ICON_TYPES[".jpg"] == "image/jpeg"
+
+
+def test_every_key_has_one_topic():
+    """Lucent's tabs show every key of a file, each exactly once."""
+    for keys, topics in ((schema.ALBUM_KEYS, schema.ALBUM_TOPICS), (schema.GALLERY_KEYS, schema.GALLERY_TOPICS)):
+        placed = [k for group in topics.values() for k in group]
+        assert sorted(placed) == sorted(keys)

@@ -244,6 +244,25 @@ GALLERY_KEYS = ["welcome", "welcome_desktop", "welcome_mobile", "album_order",
                 "site_desc_en", "site_desc_de", "site_desc_jp",
                 "logo", "favicon", "operator", "operator_url", "operator_pfp",
                 "privacy_url", "imprint_url", "badges", "credit"]
+# The topics an editor shows a file's keys under -- Lucent's tabs for an album
+# and for the site (console/lucent_pages.py). Every key is in exactly one.
+ALBUM_TOPICS = {
+    "details": ["name", "collection", "showcase", "unlisted", "reel", "sort", "tags",
+                "effect", "loc", "stat", "stats"],
+    "fotos": ["cover", "featured", "order"],
+    "aussehen": ["accent", "icon", "font", "font_scale", "wallpaper", "wallpaper_mobile",
+                 "wallpaper_tint", "wallpaper_dim"],
+}
+GALLERY_TOPICS = {
+    "identitaet": ["site_name", "site_sub", "site_hero", "site_desc", "site_desc_en",
+                   "site_desc_de", "site_desc_jp", "operator", "operator_url",
+                   "operator_pfp", "logo", "favicon", "credit"],
+    "aussehen": ["accent", "palette", "faces", "font", "font_scale", "wallpaper",
+                 "wallpaper_mobile", "wallpaper_tint", "wallpaper_dim"],
+    "startseite": ["welcome", "welcome_desktop", "welcome_mobile", "album_order", "album_sort"],
+    "footer": ["privacy_url", "imprint_url", "badges"],
+}
+
 # Which gallery.cfg keys name a file in .gallery/, and what each accepts.
 # Marks first, then the theme block's three — checked identically, because
 # the folder rule is the same one whatever the file is for.

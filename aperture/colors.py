@@ -28,6 +28,7 @@ import json
 import re
 
 from PIL import Image
+from . import imaging
 
 from . import palette as _ok
 
@@ -119,7 +120,7 @@ def read(img: Image.Image) -> tuple[str, str]:
 
 def read_file(path) -> tuple[str, str] | None:
     try:
-        with Image.open(path) as img:
+        with imaging.open_image(path) as img:
             return read(img)
     except Exception:
         return None

@@ -1,11 +1,14 @@
-fastapi==0.115.0
-uvicorn[standard]==0.32.0
-jinja2==3.1.4
-python-multipart==0.0.12
-Pillow==10.4.0
-pillow-heif==0.18.0
+fastapi==0.165.0
+# fastapi pulls starlette in; pinned here too, at the release that fixes
+# CVE-2026-48710 and the others -- tests/test_security_fixes.py checks it
+starlette==1.10.0
+uvicorn[standard]==0.54.0
+jinja2==3.1.6
+python-multipart==0.0.34
+Pillow==13.0.0
+pillow-heif==1.8.1
 watchdog==5.0.3
-markdown==3.7
+markdown==3.11.3
 # vision (off unless VISION=1): the libraries are small and always here, the
 # ~225 MB of model is fetched only when it is switched on -- aperture/vision.py
 onnxruntime==1.30.0

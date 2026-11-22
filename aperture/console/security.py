@@ -41,9 +41,11 @@ import ipaddress
 import json
 import logging
 import os
+import re
 import secrets
 import stat
 import time
+from collections import deque
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -68,6 +70,17 @@ SCRYPT = {"n": 16384, "r": 8, "p": 1, "dklen": 32}
 # never locked out for longer than a coffee.
 FREE_TRIES = 3
 MAX_BACKOFF = 300.0
+# The per-address throttle above is no brake on someone with many addresses.
+# Past this many failures inside the window -- from anywhere -- every attempt
+# waits GLOBAL_BLOCK seconds after the last failure. Short on purpose: it also
+# holds the operator up while it lasts.
+GLOBAL_WINDOW = 10 * 60
+GLOBAL_MAX_FAILURES = 50
+GLOBAL_BLOCK = 60.0
+# One entry per address that ever failed, and nothing pruned them: a table
+# anyone could grow. The oldest entries go first.
+MAX_TRACKED_IPS = 10_000
+MIN_PASSWORD = 12
 
 # Everything else needs a session.
 OPEN_PATHS = frozenset({"/login", "/api/session", "/api/health",
@@ -104,8 +117,8 @@ def set_password(password: str) -> Path:
     close to a no-op, which is one more reason the file lives under DATA_DIR
     and not in the photo tree — see runtime.py.
     """
-    if len(password) < 8:
-        raise ValueError("an admin password needs at least 8 characters")
+    if len(password) < MIN_PASSWORD:
+        raise ValueError("an admin password needs at least %d characters" % MIN_PASSWORD)
     path = _cred_path()
     path.parent.mkdir(parents=True, exist_ok=True)
     tmp = path.with_suffix(".tmp")
@@ -245,8 +258,10 @@ class Session:
 
 
 _sessions: dict[str, Session] = {}
-# ip -> [failures, blocked_until]
+# ip -> [failures, blocked_until], oldest first (insertion order)
 _failures: dict[str, list] = {}
+# when each recent failure happened, from any address -- the global ceiling
+_recent_failures: deque[float] = deque()
 
 
 def reset() -> None:
@@ -254,6 +269,7 @@ def reset() -> None:
     a door nobody has knocked on yet; nothing in the app calls it."""
     _sessions.clear()
     _failures.clear()
+    _recent_failures.clear()
 
 
 def _sweep(now: float) -> None:
@@ -293,14 +309,27 @@ def still_signed_in(request: Request) -> bool:
     return sid in _sessions
 
 
+def _global_wait(now: float) -> float:
+    while _recent_failures and now - _recent_failures[0] > GLOBAL_WINDOW:
+        _recent_failures.popleft()
+    if len(_recent_failures) < GLOBAL_MAX_FAILURES:
+        return 0.0
+    return max(0.0, _recent_failures[-1] + GLOBAL_BLOCK - now)
+
+
 def _retry_after(ip: str, now: float) -> float:
     record = _failures.get(ip)
-    return max(0.0, record[1] - now) if record else 0.0
+    own = max(0.0, record[1] - now) if record else 0.0
+    return max(own, _global_wait(now))
 
 
 def note_failure(ip: str) -> None:
     now = time.time()
-    record = _failures.setdefault(ip, [0, 0.0])
+    _recent_failures.append(now)
+    record = _failures.pop(ip, None) or [0, 0.0]
+    while len(_failures) >= MAX_TRACKED_IPS:
+        _failures.pop(next(iter(_failures)))
+    _failures[ip] = record                     # to the young end
     record[0] += 1
     if record[0] > FREE_TRIES:
         record[1] = now + min(2.0 ** (record[0] - FREE_TRIES), MAX_BACKOFF)
@@ -365,8 +394,10 @@ def issue_cookie(response, request: Request, sid: str) -> None:
     Instead it follows the scheme, and a plaintext non-loopback session gets a
     warning in the log — the honest answer being a tunnel, not a cookie flag.
     """
-    https = request.url.scheme == "https" or \
-        request.headers.get("x-forwarded-proto", "").split(",")[0].strip() == "https"
+    # The scheme as uvicorn established it: it believes X-Forwarded-Proto
+    # from FORWARDED_ALLOW_IPS and from nobody else. Reading the header here
+    # as well used to let any client decide.
+    https = request.scope.get("scheme") == "https"
     host = request.url.hostname or ""
     if not https and not _is_loopback(host):
         log.warning("aperture: session for %s over plain http - the cookie "
@@ -384,21 +415,97 @@ def _is_open_path(path: str) -> bool:
     return path in OPEN_PATHS or path.startswith(OPEN_PREFIXES)
 
 
+def _path(request: Request) -> str:
+    """The path the ROUTER will dispatch on. Never request.url.path: Starlette
+    builds request.url out of the Host header, so `Host: x/login?` made every
+    route look like /login to a check that asked it (CVE-2026-48710)."""
+    return request.scope.get("path") or "/"
+
+
+# A Host header is a name or an IP literal and maybe a port -- nothing that
+# could carry a path, a query or credentials into a URL built from it.
+_HOST = re.compile(r"(?:\[(?P<v6>[0-9A-Fa-f:.]+)\]|(?P<name>[A-Za-z0-9._-]+))(?::\d{1,5})?")
+_LOOPBACK_NAMES = frozenset({"localhost", "localhost.localdomain"})
+
+
+def host_name(request: Request) -> str | None:
+    """The request's host name, lower-case and without its port; "" when
+    there is no Host header at all; None when the header is malformed."""
+    raw = request.headers.get("host", "")
+    if not raw:
+        return ""
+    m = _HOST.fullmatch(raw.strip())
+    if m is None:
+        return None
+    return (m.group("v6") or m.group("name")).lower().rstrip(".")
+
+
+def _trusted_host(name: str) -> bool:
+    """May a console WITHOUT a password answer to this name?
+
+    DNS rebinding needs a hostname: a page on rebind.example re-resolves its
+    own name to 127.0.0.1 and talks to the console as same-origin. An IP
+    literal cannot be rebound, loopback names never leave the machine, and
+    anything else has to be listed (APERTURE_HOSTS) or be the address Lucent
+    was paired with."""
+    if name == "" or name in _LOOPBACK_NAMES or name.endswith(".localhost"):
+        return True
+    try:
+        ipaddress.ip_address(name)
+        return True
+    except ValueError:
+        pass
+    if name in settings.console_hosts:
+        return True
+    from . import lucent                       # lucent imports this module
+    paired = lucent.pairing() or {}
+    for key in ("ui_url", "base_url"):
+        try:
+            from urllib.parse import urlsplit
+            if (urlsplit(str(paired.get(key) or "")).hostname or "") == name:
+                return True
+        except ValueError:
+            continue
+    return False
+
+
 def _same_origin(request: Request) -> bool:
     """Origin is sent by every browser on a state-changing request. When it is
     there it must be ours; when it is absent the request did not come from a
-    browser's cross-site path, and the CSRF token still has to match."""
+    browser's cross-site path, and the CSRF token still has to match.
+
+    "Ours" is built from the Host header, which the guard has already checked
+    for shape (and, without a password, against the trusted names)."""
     origin = request.headers.get("origin")
     if not origin:
         return True
-    return origin.rstrip("/") == str(request.base_url).rstrip("/")
+    ours = "%s://%s" % (request.scope.get("scheme", "http"), request.headers.get("host", ""))
+    return origin.rstrip("/").lower() == ours.rstrip("/").lower()
+
+
+def _token_matches(sent: str, expected: str) -> bool:
+    # compare_digest raises TypeError on a non-ASCII str; header values arrive
+    # latin-1-decoded, so compare bytes and let a stray byte be a mismatch
+    return secrets.compare_digest(sent.encode("utf-8"), expected.encode("utf-8"))
 
 
 async def guard(request: Request, call_next):
     """Authentication and CSRF, in one place, for every route on this app."""
-    path = request.url.path
+    path = _path(request)
+    host = host_name(request)
+    if host is None:
+        return _refuse(request, 400, "malformed Host header")
 
     if open_access():
+        # No password: anything that reaches the socket gets in, so WHO can
+        # reach it is the whole question -- and a browser on a rebound
+        # hostname can. Lucent's connector routes check their own bearer
+        # token and are called by the compose service name, so they pass.
+        if not path.startswith("/lucent/v1/") and not _trusted_host(host):
+            log.warning("aperture: refused a request for host %r (not loopback, not an "
+                        "IP, not in APERTURE_HOSTS)", host)
+            return _refuse(request, 403, "unknown host -- add it to APERTURE_HOSTS, or "
+                                         "set a password")
         # No password configured. assert_safe_binding() has already decided
         # this is an acceptable place to run open, so the door stands open —
         # but a browser is still not allowed to be steered here from another
@@ -418,7 +525,7 @@ async def guard(request: Request, call_next):
         if not _same_origin(request):
             return _refuse(request, 403, "cross-site request refused")
         sent = request.headers.get(CSRF_HEADER, "")
-        if not secrets.compare_digest(sent, found[1].csrf):
+        if not _token_matches(sent, found[1].csrf):
             return _refuse(request, 403, "missing or stale CSRF token — reload the page")
 
     return await call_next(request)
@@ -429,7 +536,7 @@ def _refuse(request: Request, status: int, detail: str):
     receives a login form instead of an error is how a UI ends up rendering a
     stylesheet into a table."""
     wants_html = "text/html" in request.headers.get("accept", "") \
-        and not request.url.path.startswith("/api/")
+        and not _path(request).startswith("/api/")
     if wants_html and status == 401:
         return RedirectResponse("/login", status_code=303)
     return JSONResponse({"detail": detail}, status_code=status)

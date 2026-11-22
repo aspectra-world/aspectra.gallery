@@ -39,14 +39,14 @@
 {% set hero_side = featured and has_side %}
 {% macro side_panels() %}
     {% if album_description %}
-    <section class="g-panel g-about">
+    <section class="g-panel g-about" data-reveal>
       <h2 class="g-about__label">{{ t('album.about') }}</h2>
       <div class="g-about__body">{{ album_description | safe }}</div>
     </section>
     {% endif %}
     {% if album_stats and album_stats.has %}
-    <section class="g-panel g-facts-panel" aria-label="{{ t('aria.album_info') }}">
-      <dl class="g-kv">
+    <section class="g-panel g-facts-panel" data-reveal aria-label="{{ t('aria.album_info') }}">
+      <dl class="g-kv" data-stagger>
         {% for s in (album_stats.context or []) + (album_stats.capture or []) %}<div><dt>{{ s.key }}</dt><dd>{{ s.val }}</dd></div>{% endfor %}
       </dl>
     </section>
@@ -67,7 +67,7 @@
     {% endfor %}
     <div class="g-reel__shade"></div>
     <a class="g-reel__file" href="/image/{{ featured[0].rel_path }}" data-reel-file><i class="fa {{ 'fa-shuffle' if reel_mode == 'random' else 'fa-star' }}" aria-hidden="true"></i><span data-reel-name>{{ featured[0].filename }}</span></a>
-    <div class="g-reel__body">
+    <div class="g-reel__body" data-stagger>
       {% if kicker %}<span class="g-kicker">{{ kicker }}</span>{% endif %}
       <h1 class="g-reel__title g-reel__title--album">{% if album_icon %}<img src="{{ album_icon }}" alt="" width="48" height="48">{% endif %}{{ title }}{% if trip and trip.jp %}<span class="g-title__jp" lang="ja">{{ trip.jp }}</span>{% endif %}</h1>
       {% if album_tags %}<div class="g-reel__tags">{% for tg in album_tags %}<span>#{{ tg }}</span>{% endfor %}</div>{% endif %}
@@ -82,14 +82,14 @@
   </section>
   {% endif %}
 
-  <header class="g-head">
+  <header class="g-head" data-stagger>
     {% if not featured %}
       {% if kicker %}<span class="g-kicker">{{ kicker }}</span>{% endif %}
       <h1 class="g-title">{% if album_icon %}<img src="{{ album_icon }}" alt="">{% endif %}{{ title }}{% if trip and trip.jp %}<span class="g-title__jp">{{ trip.jp }}</span>{% endif %}</h1>
     {% endif %}
     <p class="g-meta">
-      {% if images or not sub_albums %}<span><b>{{ images | length }}</b> {{ t('unit.image') if images | length == 1 else t('unit.images') }}</span>{% endif %}
-      {% if sub_albums %}<span><b>{{ sub_albums | length }}</b> {{ t('unit.directory') if sub_albums | length == 1 else t('unit.directories') }}</span>{% endif %}
+      {% if images or not sub_albums %}<span><b data-count="{{ images | length }}">{{ images | length }}</b> {{ t('unit.image') if images | length == 1 else t('unit.images') }}</span>{% endif %}
+      {% if sub_albums %}<span><b data-count="{{ sub_albums | length }}">{{ sub_albums | length }}</b> {{ t('unit.directory') if sub_albums | length == 1 else t('unit.directories') }}</span>{% endif %}
       {% if breadcrumbs | length > 1 %}<span>{{ t('stamp.sub_album') }} · <b>{{ breadcrumbs[-2].name }}</b></span>{% endif %}
       {% if album_is_showcase %}<span class="g-mark"><i class="fa fa-star" aria-hidden="true"></i> {{ t('stamp.showcase') }}</span>{% endif %}
       {% if collection %}<span class="g-mark"><i class="fa fa-layer-group" aria-hidden="true"></i> {{ t('stamp.collection') }}</span>{% endif %}
@@ -99,7 +99,7 @@
   </header>
   {% if hero_side %}</div><aside class="g-album__side" aria-label="{{ t('aria.album_info') }}">{{ side_panels() }}</aside></div>{% endif %}
 
-  {% if not featured and album_cover and not trip %}<div class="g-cover"><img src="{{ media_url('preview', album_cover) }}" alt="" decoding="async"></div>{% endif %}
+  {% if not featured and album_cover and not trip %}<div class="g-cover" data-reveal><img src="{{ media_url('preview', album_cover) }}" alt="" decoding="async"></div>{% endif %}
 
   {% if trip %}{% include "_trip.html" %}{% endif %}
 
@@ -109,7 +109,7 @@
 
   {% if sub_albums %}
   <section class="g-section" aria-label="{{ t('aria.folders') }}">
-    <div class="g-section__head"><h2 class="g-section__title">{{ t('album.folders') }}</h2><span class="g-section__n">{{ units(sub_albums | length, 'unit.album_one', 'unit.album_many') }}</span></div>
+    <div class="g-section__head" data-reveal><h2 class="g-section__title">{{ t('album.folders') }}</h2><span class="g-section__n">{{ units(sub_albums | length, 'unit.album_one', 'unit.album_many') }}</span></div>
     <ul class="g-cards">{% for a in sub_albums %}{{ card(a) }}{% endfor %}</ul>
   </section>
   {% endif %}
@@ -119,7 +119,7 @@
     <div class="g-toolbar">
       {% if sub_albums %}<h2 class="g-section__title">{{ t('album.photos') }}</h2>{% endif %}
       {% if tags %}
-      <div class="g-chips">
+      <div class="g-chips" data-stagger>
         <a href="/album/{{ album }}{% if sort_qs %}?{{ sort_qs }}{% endif %}" class="g-chip{% if not active_tag %} is-on{% endif %}">{{ t('tag.all') }}</a>
         {% for tg in tags %}<a href="/album/{{ album }}?tag={{ tg | urlencode }}{% if sort_qs %}&{{ sort_qs }}{% endif %}" class="g-chip{% if active_tag == tg %} is-on{% endif %}">#{{ tg }}</a>{% endfor %}
       </div>
@@ -130,7 +130,7 @@
       {% if day_sections %}
         {% for sec in day_sections %}
         <section class="g-day" aria-label="{{ sec.date_h or t('day.undated') }}">
-          <header class="g-day__head">
+          <header class="g-day__head" data-reveal>
             {% if sec.day_h %}<span class="g-day__n">{{ sec.day_h }}</span>{% endif %}
             <span class="g-day__date">{{ sec.date_h or t('day.undated') }}</span>
             {% if sec.weekday %}<span class="g-day__wd">{{ sec.weekday }}</span>{% endif %}

@@ -121,6 +121,10 @@ class Settings:
     console_port: int
     console_read_only: bool
     console_allow_open: bool
+    # Host names (no port) a console WITHOUT a password answers to, beyond
+    # loopback and any IP literal. A hostname nobody listed is how a DNS
+    # rebinding page reaches a console on 127.0.0.1 -- see security.guard.
+    console_hosts: tuple[str, ...]
     console_backups: int
     console_max_upload: int
 
@@ -226,6 +230,8 @@ def load() -> Settings:
         # of the environment where it is enforced -- see
         # console.security.assert_safe_binding().
         console_allow_open=_flag("APERTURE_ALLOW_OPEN", "0"),
+        console_hosts=tuple(h.strip().lower().rstrip(".")
+                            for h in (_env("APERTURE_HOSTS") or "").split(",") if h.strip()),
         console_backups=_int("BACKUPS", 20),
         console_max_upload=_int("MAX_UPLOAD_MB", 8) * 1024 * 1024,
 

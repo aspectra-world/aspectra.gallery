@@ -43,6 +43,11 @@
   --nova-shard: light-dark(color-mix(in srgb, var(--acc) 26%, transparent), color-mix(in srgb, var(--acc) 50%, transparent));
   --nova-shard-2: light-dark(color-mix(in srgb, var(--acc) 12%, transparent), color-mix(in srgb, var(--acc) 30%, transparent));
   --nova-line: light-dark(color-mix(in srgb, var(--acc) 55%, transparent), color-mix(in srgb, var(--acc) 85%, transparent));
+  /* Facet 1.8: the light's source, the lit edge of a shard, the halo round
+     the main line, all from the same accent */
+  --nova-glow: light-dark(color-mix(in srgb, color-mix(in oklch, var(--acc) 45%, #ffffff) 50%, transparent), color-mix(in srgb, var(--acc) 40%, transparent));
+  --nova-edge: light-dark(rgba(255,255,255,.85), color-mix(in srgb, color-mix(in oklch, var(--acc) 35%, #ffffff) 38%, transparent));
+  --nova-halo: light-dark(color-mix(in srgb, var(--acc) 16%, transparent), color-mix(in srgb, var(--acc) 22%, transparent));
 
   /* Nebula names the kept building blocks (blocks.css) read */
   --label: var(--text-dim); --chrome: var(--text); --mist: var(--text-dim);
@@ -152,7 +157,7 @@ main{ flex:1 0 auto; outline:none }
   border:var(--hair) solid var(--stroke-1); background:var(--card); color:var(--text); font:500 var(--fs-300)/1 var(--sans);
   cursor:pointer; transition:background-color var(--dur-1) var(--ease), border-color var(--dur-1) var(--ease), transform var(--dur-2) var(--spring) }
 .g-btn:hover{ background:var(--surface-2) }
-.g-btn:active{ transform:scale(.97) }
+.g-btn:active{ transform:var(--press) }
 .g-btn--primary{ background:var(--acc-fill); border-color:transparent; color:var(--on-acc) }
 .g-btn--primary:hover{ background:color-mix(in srgb, var(--acc-fill) 88%, #000) }
 .g-btn--glass{ background:rgba(255,255,255,.1); border-color:rgba(255,255,255,.22); color:#fff;
@@ -475,14 +480,115 @@ details > summary{ cursor:pointer; color:var(--text-dim); font:500 var(--fs-200)
 @keyframes g-rise{ from{ opacity:0; transform:translateY(8px) } }
 @media (prefers-reduced-motion: no-preference){
   .g-page > *{ animation:g-rise var(--dur-3) var(--ease-out) backwards }
-  .g-page > :nth-child(2){ animation-delay:40ms } .g-page > :nth-child(3){ animation-delay:80ms } .g-page > :nth-child(4){ animation-delay:120ms }
+  .g-page > :nth-child(2){ animation-delay:calc(var(--stagger) * 1) } .g-page > :nth-child(3){ animation-delay:calc(var(--stagger) * 2) }
+  .g-page > :nth-child(4){ animation-delay:calc(var(--stagger) * 3) } .g-page > :nth-child(5){ animation-delay:calc(var(--stagger) * 4) }
+  .g-page > :nth-child(n+6){ animation-delay:calc(var(--stagger) * 5) }
+  /* a photo stepped in place: the page does not rise a second time */
+  .g-page.is-swap > *, .g-page.is-swap [data-stagger] > *{ animation:none }
 }
 /* tiles rise only where there is a mouse, and only on the first screen; on
-   a phone the page arrives once and then stays still */
+   a phone the page arrives once and then stays still. In sequence: gallery.js
+   writes --i on the first twelve (Facet's --stagger step, a little tighter). */
 @media (prefers-reduced-motion: no-preference) and (hover: hover) and (pointer: fine){
-  :is(.g-cards, .g-photos, .g-posters) > li:nth-child(-n+12){ animation:g-rise var(--dur-3) var(--ease-out) backwards }
+  :is(.g-cards, .g-photos, .g-posters) > li:nth-child(-n+12){ animation:g-rise var(--dur-4) var(--ease-out) backwards;
+    animation-delay:calc(var(--i, 0) * var(--stagger) * .7 + var(--stagger) * 2) }
 }
 @media (prefers-reduced-motion: reduce){ .g-reel__slide img{ transition:none } }
+
+/* ---------------- Facet's motion, in the gallery ----------------
+   The vocabulary of FACET.md rule 6, on the gallery's own parts. Small
+   things only: a heading, a panel, a fact, a button. The big photo grids
+   keep the plain rise above (no filter, nothing held), for the reason the
+   entrances note gives. */
+
+/* the mode switch opens as a circle across the page load (f/vt.js); every
+   other navigation is skipped there, so it stays a plain page load */
+@view-transition{ navigation:auto }
+
+/* numbers that count up keep their width while they do */
+[data-count]{ font-variant-numeric:tabular-nums }
+
+/* the backdrop: Nova ignites on the welcome page and drifts everywhere
+   (f-nova--live). Every other page arrives with Nova already lit, so a
+   click through the albums does not flash the light up each time. */
+body:not(.page-welcome) .g-bg.f-nova--live::before{ animation:f-drift 18s var(--ease-io) infinite alternate }
+
+/* the bar is glass: its glint follows the pointer (gallery.js writes
+   --mx/--my, as facet.js does for .f-glass) */
+.g-bar{ isolation:isolate }
+.g-bar::before{ content:""; position:absolute; inset:0; z-index:-1; pointer-events:none;
+  background:radial-gradient(360px circle at var(--mx, 12%) var(--my, 0%), var(--glass-glint), transparent 60%);
+  opacity:0; transition:opacity var(--dur-3) var(--ease) }
+@media (hover: hover) and (pointer: fine){ .g-bar:hover::before{ opacity:.9 } }
+
+/* press: the spring, never on hover (Facet: hover is a step of colour) */
+.g-btn:active, .g-reel__nav:active, .g-icon:active, .g-chip:active, .g-link:active,
+.g-menu > summary:active, .g-lang a:active, .g-more:active{ transform:var(--press); transition-duration:var(--dur-1) }
+:is(.g-reel__nav, .g-icon, .g-chip, .g-link, .g-menu > summary, .g-lang a, .g-more){
+  transition-property:color, background-color, border-color, box-shadow, transform; transition-duration:var(--dur-1), var(--dur-1), var(--dur-1), var(--dur-2), var(--dur-2);
+  transition-timing-function:var(--ease), var(--ease), var(--ease), var(--ease), var(--spring) }
+/* the ripple from the press point (gallery.js; Facet's .f-ripple) */
+:where(.g-btn, .g-reel__nav, .g-chip, .g-icon, .g-link){ position:relative; overflow:hidden; isolation:isolate }
+/* the sheen sweep on the one primary button */
+.g-btn--primary::after{ content:""; position:absolute; inset:0; z-index:-1; pointer-events:none;
+  background:linear-gradient(105deg, transparent 30%, rgba(255,255,255,.28) 50%, transparent 70%);
+  transform:translateX(-120%); transition:transform var(--dur-4) var(--ease-out) }
+.g-btn--primary:hover::after{ transform:translateX(120%) }
+/* the more-link's chevron leans the way it goes */
+.g-more .fa, .g-poster__go .fa{ transition:transform var(--dur-2) var(--spring) }
+.g-more:hover .fa{ transform:translateX(3px) }
+/* the sort menu's chevron turns with it */
+.g-menu > summary .fa-chevron-down{ transition:transform var(--dur-3) var(--spring) }
+.g-menu[open] > summary .fa-chevron-down{ transform:rotate(180deg) }
+.g-menu__list a{ transition:background-color var(--dur-1) var(--ease), color var(--dur-1) var(--ease) }
+
+/* the active nav link and the active language carry a soft indicator that
+   arrives rather than appears */
+.g-link.is-on, .g-lang a.is-on{ animation:f-pop var(--dur-3) var(--spring) backwards; animation-delay:calc(var(--stagger) * 2) }
+
+/* the photo's stage: the picture settles in, the arrows come forward on hover */
+.g-stage img{ animation:f-fade var(--dur-4) var(--ease) backwards }
+.g-stage__arrow .fa{ transition:transform var(--dur-2) var(--spring) }
+.g-stage__arrow--prev:hover .fa{ transform:translateX(-2px) }
+.g-stage__arrow--next:hover .fa{ transform:translateX(2px) }
+/* a photo stepped in place: drawn at once, it only settles (no opacity) */
+@keyframes g-settle{ from{ transform:scale(.985) } }
+@media (prefers-reduced-motion: no-preference){
+  .g-page.is-swap .g-stage img{ animation:g-settle var(--dur-3) var(--spring-soft) }
+}
+
+/* the lightbox: the picture lifts in, the bar follows */
+.g-lb[open] .g-lb__stage img{ animation:f-pop var(--dur-3) var(--ease-out) backwards }
+.g-lb[open] .g-lb__bar{ animation:f-rise var(--dur-3) var(--ease-out) backwards; animation-delay:var(--stagger) }
+
+/* the reel's label changes with the slide */
+.g-reel__file span.is-new{ animation:f-rise var(--dur-3) var(--ease-out) backwards }
+
+/* the 404: the big figure pops, the words follow */
+.g-lost__code{ animation:f-pop var(--dur-5) var(--spring) backwards }
+
+/* /stats: the bars grow, the columns rise, the dial turns in, the stack
+   fills from the left. One sequence per chart, on load (like .f-meter). */
+.ch-bar__fill, .ch-stack__seg{ transform-box:fill-box; transform-origin:0 50%; animation:f-grow var(--dur-5) var(--ease-out) backwards }
+.ch-col__fill{ transform-box:fill-box; transform-origin:50% 100%; animation:f-grow-y var(--dur-4) var(--spring-soft) backwards }
+.ch-bar:nth-child(2) .ch-bar__fill{ animation-delay:calc(var(--stagger) * 1) } .ch-bar:nth-child(3) .ch-bar__fill{ animation-delay:calc(var(--stagger) * 2) }
+.ch-bar:nth-child(4) .ch-bar__fill{ animation-delay:calc(var(--stagger) * 3) } .ch-bar:nth-child(5) .ch-bar__fill{ animation-delay:calc(var(--stagger) * 4) }
+.ch-bar:nth-child(n+6) .ch-bar__fill{ animation-delay:calc(var(--stagger) * 5) }
+.ch-col{ --i:0 }
+.ch-col__fill{ animation-delay:calc(var(--i) * 18ms) }
+.ch-dial svg{ transform-origin:50% 50%; animation:f-ring-in var(--dur-5) var(--spring-soft) backwards }
+.ch-dial__spoke{ animation:f-fade var(--dur-4) var(--ease) backwards; animation-delay:calc(var(--stagger) * 3) }
+.ch-stack__key{ animation:f-rise var(--dur-4) var(--ease-out) backwards }
+.ch-stack__key:nth-child(2){ animation-delay:calc(var(--stagger) * 1) } .ch-stack__key:nth-child(3){ animation-delay:calc(var(--stagger) * 2) }
+.ch-stack__key:nth-child(n+4){ animation-delay:calc(var(--stagger) * 3) }
+.ch-more__ico{ transition:rotate var(--dur-3) var(--spring) }
+
+/* motion asked down, by the system or by the person: everything above stops */
+@media (prefers-reduced-motion: reduce){
+  .g-bar::before, .g-btn--primary::after{ transition:none }
+  .ch-bar__fill, .ch-stack__seg, .ch-col__fill, .ch-dial svg, .ch-dial__spoke{ animation:none }
+}
+:root[data-motion="reduced"] :is(.ch-bar__fill, .ch-stack__seg, .ch-col__fill, .ch-dial svg, .ch-dial__spoke){ animation:none }
 
 /* A photo grows under the pointer only where there is one: on a touch
    screen :hover sticks to whatever a finger touched while scrolling. */

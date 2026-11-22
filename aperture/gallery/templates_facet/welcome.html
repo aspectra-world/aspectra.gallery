@@ -29,10 +29,10 @@
     {% endfor %}
     <div class="g-reel__shade"></div>
     <a class="g-reel__file" href="/image/{{ shuffle[0].rel_path }}" data-reel-file><i class="fa fa-image" aria-hidden="true"></i><span data-reel-name>{{ shuffle[0].album }} / {{ shuffle[0].filename }}</span></a>
-    <div class="g-reel__body">
+    <div class="g-reel__body" data-stagger>
       <h1 class="g-reel__title">{{ brand.hero }}</h1>
       <p class="g-reel__lede">{{ t('welcome.lead') }}</p>
-      <div class="g-reel__ctas">
+      <div class="g-reel__ctas" data-stagger>
         <a href="/albums" class="g-btn g-btn--primary"><i class="fa fa-images" aria-hidden="true"></i>{{ t('welcome.browse') }}</a>
         <a href="/image/{{ shuffle[0].rel_path }}" class="g-btn g-btn--glass" data-reel-open><i class="fa fa-expand" aria-hidden="true"></i>{{ t('welcome.open_frame') }}</a>
         {% if brand.operator_url %}<a href="{{ brand.operator_url }}" class="g-btn g-btn--glass" target="_blank" rel="noopener">{% if brand.pfp %}<img src="{{ brand.pfp }}" alt="" width="18" height="18">{% endif %}{{ t('welcome.about_me') }}</a>{% endif %}
@@ -55,8 +55,8 @@
   {% endif %}
 
   <section class="g-section" aria-labelledby="arc-head">
-    <div class="g-section__head"><h2 class="g-section__title" id="arc-head">{{ t('band.head') }}</h2><a class="g-more" href="/stats">{{ t('band.stats') }}<i class="fa fa-chevron-right" aria-hidden="true"></i></a></div>
-    <dl class="g-facts">
+    <div class="g-section__head" data-reveal><h2 class="g-section__title" id="arc-head">{{ t('band.head') }}</h2><a class="g-more" href="/stats">{{ t('band.stats') }}<i class="fa fa-chevron-right" aria-hidden="true"></i></a></div>
+    <dl class="g-facts" data-stagger data-reveal>
       <div class="g-fact"><dt><i class="fa fa-image" aria-hidden="true"></i>{{ t('band.images') }}</dt><dd data-count="{{ image_count }}">{{ image_count }}</dd></div>
       <div class="g-fact"><dt><i class="fa fa-folder-open" aria-hidden="true"></i>{{ t('band.albums') }}</dt><dd data-count="{{ album_count }}">{{ album_count }}</dd></div>
       {% if showcase_count %}<div class="g-fact"><dt><i class="fa fa-star" aria-hidden="true"></i>{{ t('band.featured') }}</dt><dd data-count="{{ showcase_count }}">{{ showcase_count }}</dd></div>{% endif %}
@@ -66,7 +66,7 @@
 
   {% if showcase_albums %}
   <section class="g-section" aria-labelledby="sc-head">
-    <div class="g-section__head"><h2 class="g-section__title" id="sc-head">{{ t('showcase.head') }}</h2><a class="g-more" href="/albums">{{ t('showcase.all') }}<i class="fa fa-chevron-right" aria-hidden="true"></i></a></div>
+    <div class="g-section__head" data-reveal><h2 class="g-section__title" id="sc-head">{{ t('showcase.head') }}</h2><a class="g-more" href="/albums">{{ t('showcase.all') }}<i class="fa fa-chevron-right" aria-hidden="true"></i></a></div>
     {{ posters(showcase_albums) }}
   </section>
   {% endif %}

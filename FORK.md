@@ -40,5 +40,4 @@ carries the fork's name.
 
 ## Planned
 
-- A card for aspectra.home (`GET /api/home`, contract 1).
 - In the admin: scan interval and folder watcher, GPS hiding/stripping, image sizes.

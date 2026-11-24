@@ -2,9 +2,30 @@
 
 aspectra.gallery is a fork of [Aperture](https://github.com/lucya-astralis/gallery) by
 [lucya.systems](https://lucya.systems), AGPL-3.0 with the additional terms in `NOTICE`.
-Updates from the original come in by git (`git fetch upstream && git merge upstream/main`),
-which is why the Python package is still called `aperture` inside: only what a person sees
-carries the fork's name.
+Updates from the original come in by git with `tools/upstream.sh` (see below), which is
+why the Python package is still called `aperture` inside: only what a person sees carries
+the fork's name.
+
+## Taking in updates
+
+`tools/upstream.sh` shows what is new upstream and merges it on a branch of its own
+(`update/upstream-<version>`), so it can be looked at and adapted before it reaches main:
+
+    tools/upstream.sh            what is new, and which files both sides changed
+    tools/upstream.sh start      branch off main, merge upstream/main into it
+    tools/upstream.sh continue   after resolving conflicts: checks, tests, commit
+    tools/upstream.sh finish     main fast-forwards to the branch (nothing is pushed)
+    tools/upstream.sh abort      drop the update
+
+`start upstream/<branch>` takes in another upstream branch instead of main. Files this
+fork removed stay removed. Before the commit the script checks what an update must not
+undo (name, `REPO_URL`, `UPDATE_URL`, attribution, licence files, the aspectra sheets and
+the starfield, no workflow beside `ci.yml`) and runs the tests in a throwaway container.
+Git remembers each resolved conflict (`rerere`) and replays it the next time.
+
+To keep merges quiet, the fork's changes stay where they are now: in files of its own
+(`aspectra*.css`, `starfield.js`, this file) or in commented blocks. Notes on the fork go
+here, never into `CHANGELOG.md`, which stays upstream's.
 
 ## Kept, because the licence asks for it
 
